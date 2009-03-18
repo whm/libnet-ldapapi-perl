@@ -2290,6 +2290,8 @@ Net::LDAPapi - Perl5 Module Supporting LDAP API
 
 =head1 SUPPORTED METHODS
 
+=over 4
+
 =item abandon MSGID SCTRLS CCTRLS
 
   This cancels an asynchronous LDAP operation that has not completed.  It
@@ -2904,6 +2906,8 @@ Net::LDAPapi - Perl5 Module Supporting LDAP API
   Example:
 
     $status = $ld->url_search_s($my_ldap_url,0,2);
+
+=back
 
 =head1 AUTHOR
 
