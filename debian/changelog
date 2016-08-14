@@ -1,3 +1,9 @@
+libnet-ldapapi-perl (3.0.4-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Bill MacAllister <bill@ca-zephyr.org>  Sun, 14 Aug 2016 00:57:20 -0700
+
 libnet-ldapapi-perl (3.0.3-7) unstable; urgency=low
 
   * Initial upload to Debian.  (Closes: #500174)
