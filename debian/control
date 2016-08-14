@@ -2,10 +2,10 @@ Source: libnet-ldapapi-perl
 Section: perl
 Priority: optional
 Build-Depends: debhelper (>= 7.0.50), perl, libldap2-dev, libsasl2-dev
-Maintainer: Bill MacAllister <whm@stanford.edu>
+Maintainer: Bill MacAllister <bill@ca-zephyr.org>
 Uploaders: Russ Allbery <rra@debian.org>
-Standards-Version: 3.8.1
-Homepage: http://sf.net/projects/net-ldapapi/
+Standards-Version: 3.9.8
+Homepage: https://github.com/quanah/net-ldapapi
 
 Package: libnet-ldapapi-perl
 Architecture: any
