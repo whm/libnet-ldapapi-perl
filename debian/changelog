@@ -1,0 +1,89 @@
+libnet-ldapapi-perl (3.0.4-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Fix undef comparison
+  * Misc variable initializations to quiet warnings
+  * Fixed sasl mechanisms initializtion
+  * Examples cleanup
+  * LDAPv3 extended operation support
+  * New developer mode test suite
+  * Fixed quanah/net-ldapapi#3: ldap_set_rebind_proc XS being called with
+    invalid arguments from set_rebind_proc
+  * Fixed quanah/net-ldapapi#6: ldap_sasl_bind has wrong prototype in
+    LDAPapi.xs
+  * Fixed quanah/net-ldapapi#8: search_s() clobbers ATTRS parameter
+  * Fixed quanah/net-ldapapi#11: result() blocking when called with output
+    from rename()
+  * Fixed quanah/net-ldapapi#20: ldap_result() doesn't honour passed
+    timeout value
+  * Fixed quanah/net-ldapapi#21: ldap_set_option(LDAP_OPT_TIMEOUT, 1) on
+    OpenLDAP returns -1
+  * Fixed quanah/net-ldapapi#28: Server control responses get eaten after
+    a NULL character in the berval
+  * Fixed quanah/net-ldapapi#30: ldap_search_ext() and ldap_search_ext_s()
+    segfault when used with timeout
+  * Fixed quanah/net-ldapapi#31: ldap_result() and ldap_url_search_st()
+    timeout parameters have a granularity of 1 second
+  * Fixed quanah/net-ldapapi#40: Server control requests get eaten after a
+    NULL character in the berval
+  * Correct merge problem with POD error.
+  * Update standards version to 3.9.8 (no changes required).
+
+ -- Bill MacAllister <bill@ca-zephyr.org>  Sun, 14 Aug 2016 00:57:20 -0700
+
+libnet-ldapapi-perl (3.0.3-7) unstable; urgency=low
+
+  * Initial upload to Debian.  (Closes: #500174)
+  * Patch upstream POD documentation to fix syntax errors.
+  * Add a watch file.
+  * Add Homepage control field.
+  * Switch to the new proposed copyright format and update dates.
+  * Add ${misc:Depends} to dependencies.
+  * Update to debhelper compatibility level V7.
+    - Use debhelper rule minimization with overrides.
+  * Update standards version to 3.8.1 (no changes required).
+  * Add myself as an uploader.
+
+ -- Russ Allbery <rra@debian.org>  Tue, 17 Mar 2009 17:27:48 -0700
+
+libnet-ldapapi-perl (3.0.3-6) unstable; urgency=low
+
+  * Turn on gcc optimization.
+  * Some package cleanup.  Remove explicit version dependancies.  Remove
+    meaningless comments.
+
+ -- Bill MacAllister <whm@stanford.edu>  Sat, 15 Nov 2008 22:47:01 -0800
+
+libnet-ldapapi-perl (3.0.3-5) unstable; urgency=low
+
+  * Change the dependencies to be less stringent.
+
+ -- Bill MacAllister <whm@stanford.edu>  Sun, 19 Oct 2008 23:08:38 -0700
+
+libnet-ldapapi-perl (3.0.3-4) unstable; urgency=low
+
+  * Removed unnecessary rmdir.
+  * Updated standards version to 3.8.0.
+  * Adding examples to package.
+
+ -- Bill MacAllister <whm@stanford.edu>  Thu, 25 Sep 2008 10:47:25 -0700
+
+libnet-ldapapi-perl (3.0.3-3) unstable; urgency=low
+
+  * Correct an error in the build process.
+
+ -- Bill MacAllister <whm@stanford.edu>  Thu,  4 Sep 2008 14:22:41 -0700
+
+libnet-ldapapi-perl (3.0.3-2) unstable; urgency=low
+
+  * Fix up the package to make sure the module is installed in the 
+    correct directory.
+
+ -- Bill MacAllister <whm@stanford.edu>  Thu,  4 Sep 2008 00:20:02 -0700
+
+libnet-ldapapi-perl (3.0.3-1) unstable; urgency=low
+
+  * Initial release 
+
+ -- Bill MacAllister <whm@stanford.edu>  Wed,  3 Sep 2008 22:51:50 -0700
+
