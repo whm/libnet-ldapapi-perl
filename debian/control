@@ -9,7 +9,8 @@ Homepage: https://github.com/quanah/net-ldapapi
 
 Package: libnet-ldapapi-perl
 Architecture: any
-Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Depends: ${perl:Depends}, ${shlibs:Depends}, ${misc:Depends},
+ libconvert-asn1-perl
 Description: Perl bindings for OpenLDAP C API
  Net::LDAPapi provides a Perl interface to the OpenLDAP C libraries.  
  Both the original "C API" and new "Perl OO" style interface methods
