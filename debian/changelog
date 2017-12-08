@@ -1,3 +1,11 @@
+libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Fix cookie handling with MMR configuration
+  * Fix ASN1 encoding of sync cookie
+
+ -- Bill MacAllister <whm@dropbox.com>  Fri, 08 Dec 2017 00:13:17 +0000
+
 libnet-ldapapi-perl (3.0.4-1) unstable; urgency=medium
 
   * New upstream release.
@@ -76,14 +84,13 @@ libnet-ldapapi-perl (3.0.3-3) unstable; urgency=low
 
 libnet-ldapapi-perl (3.0.3-2) unstable; urgency=low
 
-  * Fix up the package to make sure the module is installed in the 
+  * Fix up the package to make sure the module is installed in the
     correct directory.
 
  -- Bill MacAllister <whm@stanford.edu>  Thu,  4 Sep 2008 00:20:02 -0700
 
 libnet-ldapapi-perl (3.0.3-1) unstable; urgency=low
 
-  * Initial release 
+  * Initial release
 
  -- Bill MacAllister <whm@stanford.edu>  Wed,  3 Sep 2008 22:51:50 -0700
-
