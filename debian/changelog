@@ -8,6 +8,7 @@ libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
   [ Russ Allbery ]
   * Update debhelper compatibility level to V11.
     - Remove unnecessary binary-arch target.
+  * Add Rules-Requires-Root: no.
   * Update debian/copyright to copyright-format 1.0.
   * Run wrap-and-sort -ast.
 

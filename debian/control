@@ -7,6 +7,7 @@ Build-Depends:
  libsasl2-dev,
  perl,
  quilt,
+Rules-Requires-Root: no
 Maintainer: Bill MacAllister <bill@ca-zephyr.org>
 Uploaders:
  Russ Allbery <rra@debian.org>,
