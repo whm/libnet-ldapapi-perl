@@ -10,7 +10,7 @@ Rules-Requires-Root: no
 Maintainer: Bill MacAllister <bill@ca-zephyr.org>
 Uploaders:
  Russ Allbery <rra@debian.org>,
-Standards-Version: 3.9.8
+Standards-Version: 4.1.2
 Homepage: https://github.com/quanah/net-ldapapi
 
 Package: libnet-ldapapi-perl
