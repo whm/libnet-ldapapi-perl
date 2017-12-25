@@ -1,0 +1,27 @@
+Source: libnet-ldapapi-perl
+Section: perl
+Priority: optional
+Build-Depends:
+ debhelper (>= 11),
+ libldap2-dev,
+ libsasl2-dev,
+ perl,
+Rules-Requires-Root: no
+Maintainer: Bill MacAllister <bill@ca-zephyr.org>
+Uploaders:
+ Russ Allbery <rra@debian.org>,
+Standards-Version: 4.1.2
+Homepage: https://github.com/quanah/net-ldapapi
+
+Package: libnet-ldapapi-perl
+Architecture: any
+Depends:
+ libconvert-asn1-perl,
+ ${misc:Depends},
+ ${perl:Depends},
+ ${shlibs:Depends},
+Description: Perl bindings for OpenLDAP C API
+ Net::LDAPapi provides a Perl interface to the OpenLDAP C libraries.
+ Both the original "C API" and new "Perl OO" style interface methods
+ are supported.  This module differs from Net::LDAP in that it
+ uses C bindings to achieve significant performance improvements.
