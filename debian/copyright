@@ -13,7 +13,7 @@ License: GPL-1+ or Artistic
  under the same terms as Perl itself.
  .
  Perl is distributed under either the Artistic License or the GPL (version
- 1 or later).  The full text of the current version of the GPL is
- available in Debian systems in /usr/share/common-licenses/GPL.  The full
- text of the Artistic License is available on Debian systems in
+ 1 or later).  The full text of the GPL version 1 is available in Debian
+ systems in /usr/share/common-licenses/GPL-1.  The full text of the
+ Artistic License is available on Debian systems in
  /usr/share/common-licenses/Artistic.
