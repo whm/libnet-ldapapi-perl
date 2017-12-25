@@ -6,6 +6,8 @@ libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
   * Fix ASN1 encoding of sync cookie
 
   [ Russ Allbery ]
+  * Update debhelper compatibility level to V11.
+    - Remove unnecessary binary-arch target.
   * Update debian/copyright to copyright-format 1.0.
   * Run wrap-and-sort -ast.
 

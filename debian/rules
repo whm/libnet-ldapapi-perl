@@ -10,24 +10,3 @@ override_dh_auto_test:
 
 override_dh_compress:
 	dh_compress -X examples
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdocs Todo README
-	dh_installexamples 
-	dh_installchangelogs Changes
-	dh_link
-	dh_strip
-	dh_compress -X examples
-	dh_fixperms
-	dh_makeshlibs
-	dh_installdeb
-	dh_perl 
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
