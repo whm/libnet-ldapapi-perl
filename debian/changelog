@@ -7,6 +7,7 @@ libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
 
   [ Russ Allbery ]
   * Update debian/copyright to copyright-format 1.0.
+  * Run wrap-and-sort -ast.
 
  -- Bill MacAllister <whm@dropbox.com>  Fri, 08 Dec 2017 00:13:17 +0000
 
