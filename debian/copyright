@@ -1,15 +1,14 @@
-Format-Specification:
- http://wiki.debian.org/Proposals/CopyrightFormat?action=recall&rev=443
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: http://sf.net/projects/net-ldapapi/
+Upstream-Contact: Quanah Gibson-Mount <mishikal@yahoo.com>
 Upstream-Name: Net-LDAPapi
-Upstream-Maintainer: Quanah Gibson-Mount <mishikal@yahoo.com>
-Upstream-Source: http://sf.net/projects/net-ldapapi/
 
 Files: *
-Copyright: 2007 Quanah Gibson-Mount. All rights reserved
+Copyright: 2007, 2017 Quanah Gibson-Mount. All rights reserved
  2007, 2008, 2009 Board of Trustees, Leland Stanford Jr. University
  2003 Howard Chu. All rights reserved.
  1998 Clayton Donley. All rights reserved.
-License: GPL-1+ | Artistic
+License: GPL-1+ or Artistic
  This program is free software; you can redistribute it and/or modify it
  under the same terms as Perl itself.
  .

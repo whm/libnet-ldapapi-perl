@@ -1,8 +1,12 @@
 libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
 
+  [ Bill MacAllister ]
   * New upstream release.
   * Fix cookie handling with MMR configuration
   * Fix ASN1 encoding of sync cookie
+
+  [ Russ Allbery ]
+  * Update debian/copyright to copyright-format 1.0.
 
  -- Bill MacAllister <whm@dropbox.com>  Fri, 08 Dec 2017 00:13:17 +0000
 
