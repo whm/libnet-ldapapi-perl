@@ -6,7 +6,6 @@ Build-Depends:
  libldap2-dev,
  libsasl2-dev,
  perl,
- quilt,
 Rules-Requires-Root: no
 Maintainer: Bill MacAllister <bill@ca-zephyr.org>
 Uploaders:

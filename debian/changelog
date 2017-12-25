@@ -6,6 +6,7 @@ libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
   * Fix ASN1 encoding of sync cookie
 
   [ Russ Allbery ]
+  * Remove unnecessary quilt build dependency.
   * Update debhelper compatibility level to V11.
     - Remove unnecessary binary-arch target.
   * Add Rules-Requires-Root: no.
