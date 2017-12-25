@@ -15,7 +15,7 @@ libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
   * Update standards version to 4.1.2 (no changes required).
   * Run wrap-and-sort -ast.
 
- -- Bill MacAllister <whm@dropbox.com>  Fri, 08 Dec 2017 00:13:17 +0000
+ -- Russ Allbery <rra@debian.org>  Sun, 24 Dec 2017 21:44:28 -0800
 
 libnet-ldapapi-perl (3.0.4-1) unstable; urgency=medium
 
