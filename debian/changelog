@@ -1,10 +1,21 @@
 libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
 
+  [ Bill MacAllister ]
   * New upstream release.
   * Fix cookie handling with MMR configuration
   * Fix ASN1 encoding of sync cookie
 
- -- Bill MacAllister <whm@dropbox.com>  Fri, 08 Dec 2017 00:13:17 +0000
+  [ Russ Allbery ]
+  * Enable bindnow build hardening.
+  * Remove unnecessary quilt build dependency.
+  * Update debhelper compatibility level to V11.
+    - Remove unnecessary binary-arch target.
+  * Add Rules-Requires-Root: no.
+  * Update debian/copyright to copyright-format 1.0.
+  * Update standards version to 4.1.2 (no changes required).
+  * Run wrap-and-sort -ast.
+
+ -- Russ Allbery <rra@debian.org>  Sun, 24 Dec 2017 21:44:28 -0800
 
 libnet-ldapapi-perl (3.0.4-1) unstable; urgency=medium
 
