@@ -1,3 +1,9 @@
+libnet-ldapapi-perl (3.0.7-1) unstable; urgency=medium
+
+  * Import new upstream release.
+
+ -- Bill MacAllister <bill@ca-zephyr.org>  Tue, 14 Jan 2020 08:05:29 +0000
+
 libnet-ldapapi-perl (3.0.5-1) unstable; urgency=medium
 
   [ Bill MacAllister ]
