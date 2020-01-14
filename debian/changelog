@@ -1,6 +1,7 @@
 libnet-ldapapi-perl (3.0.7-1) unstable; urgency=medium
 
   * Import new upstream release.
+  * Remove obsolete Debian version patch.
 
  -- Bill MacAllister <bill@ca-zephyr.org>  Tue, 14 Jan 2020 08:05:29 +0000
 
