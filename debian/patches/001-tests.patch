@@ -4,7 +4,7 @@ server.
 Index: libnet-ldapapi-perl/tests/data/config_footer.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/config_footer.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/config_footer.ldif	2020-12-24 07:52:56.940790394 +0000
 @@ -0,0 +1,31 @@
 +dn: olcBackend={0}mdb,cn=config
 +objectClass: olcBackendConfig
@@ -40,7 +40,7 @@ Index: libnet-ldapapi-perl/tests/data/config_footer.ldif
 Index: libnet-ldapapi-perl/tests/data/config_header.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/config_header.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/config_header.ldif	2020-12-24 07:52:56.940790394 +0000
 @@ -0,0 +1,22 @@
 +dn: cn=config
 +objectClass: olcGlobal
@@ -67,7 +67,7 @@ Index: libnet-ldapapi-perl/tests/data/config_header.ldif
 Index: libnet-ldapapi-perl/tests/data/people.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/people.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/people.ldif	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,557 @@
 +dn: dc=test,dc=com
 +objectClass: organization
@@ -629,7 +629,7 @@ Index: libnet-ldapapi-perl/tests/data/people.ldif
 Index: libnet-ldapapi-perl/tests/data/schema_core.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/schema_core.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/schema_core.ldif	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,559 @@
 +dn: cn=core,cn=schema,cn=config
 +objectClass: olcSchemaConfig
@@ -1193,7 +1193,7 @@ Index: libnet-ldapapi-perl/tests/data/schema_core.ldif
 Index: libnet-ldapapi-perl/tests/data/schema_cosine.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/schema_cosine.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/schema_cosine.ldif	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,352 @@
 +dn: cn=cosine,cn=schema,cn=config
 +objectClass: olcSchemaConfig
@@ -1550,7 +1550,7 @@ Index: libnet-ldapapi-perl/tests/data/schema_cosine.ldif
 Index: libnet-ldapapi-perl/tests/data/schema_inetorgperson.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/schema_inetorgperson.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/schema_inetorgperson.ldif	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,82 @@
 +dn: cn=inetorgperson,cn=schema,cn=config
 +objectClass: olcSchemaConfig
@@ -1637,7 +1637,7 @@ Index: libnet-ldapapi-perl/tests/data/schema_inetorgperson.ldif
 Index: libnet-ldapapi-perl/tests/data/schema_krb5_kdc.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/schema_krb5_kdc.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/schema_krb5_kdc.ldif	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,66 @@
 +dn: cn=krb5-kdc,cn=schema,cn=config
 +objectClass: olcSchemaConfig
@@ -1708,7 +1708,7 @@ Index: libnet-ldapapi-perl/tests/data/schema_krb5_kdc.ldif
 Index: libnet-ldapapi-perl/tests/data/schema_nis.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/schema_nis.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/schema_nis.ldif	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,212 @@
 +dn: cn=nis,cn=schema,cn=config
 +objectClass: olcSchemaConfig
@@ -1925,7 +1925,7 @@ Index: libnet-ldapapi-perl/tests/data/schema_nis.ldif
 Index: libnet-ldapapi-perl/tests/data/schema_openssh_lpk.ldif
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/data/schema_openssh_lpk.ldif	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/data/schema_openssh_lpk.ldif	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,14 @@
 +dn: cn={6}openssh-lpk,cn=schema,cn=config
 +objectClass: olcSchemaConfig
@@ -1944,7 +1944,7 @@ Index: libnet-ldapapi-perl/tests/data/schema_openssh_lpk.ldif
 Index: libnet-ldapapi-perl/tests/libnet-ldapapi.t
 ===================================================================
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ libnet-ldapapi-perl/tests/libnet-ldapapi.t	2020-12-24 07:33:11.131015546 +0000
++++ libnet-ldapapi-perl/tests/libnet-ldapapi.t	2020-12-24 07:52:56.944790602 +0000
 @@ -0,0 +1,1725 @@
 +#!/usr/bin/perl -w
 +#
@@ -3671,3 +3671,23 @@ Index: libnet-ldapapi-perl/tests/libnet-ldapapi.t
 +}
 +
 +exit 0;
+Index: libnet-ldapapi-perl/tests/Makefile
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/Makefile	2020-12-24 07:53:30.046515350 +0000
+@@ -0,0 +1,15 @@
++#
++#  directory/tests/Makefile
++#
++#  Run our tests, either quietly or with verbose output
++#
++#  This is a Makefile - so the indented lines start with a TAB!
++#
++#  Whoever came up with the wonderful idea that whitespace was significant..?
++#
++all:
++	perl -MTest::Harness -e '$$Test::Harness::verbose=0; runtests @ARGV;' *.t
++verbose:
++	perl -MTest::Harness -e '$$Test::Harness::verbose=1; runtests @ARGV;' *.t
++clean:
++	find . -name '*~' -exec rm -f \{\} \;
