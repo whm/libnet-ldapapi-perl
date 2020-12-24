@@ -8,8 +8,10 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+bindnow
 override_dh_auto_configure:
 	dh_auto_configure -- --sasl=/usr/include/sasl
 
-# Suppress the test suite since it requires interactivity.
+# Suppress the upstream test suite since it requires interactivity.
+# Add Debian build test support.
 override_dh_auto_test:
+	cd tests; make verbose
 
 override_dh_compress:
 	dh_compress -X examples
