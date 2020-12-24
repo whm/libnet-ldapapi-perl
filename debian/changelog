@@ -3,6 +3,7 @@ libnet-ldapapi-perl (3.0.7-1) unstable; urgency=medium
   * Import new upstream release.
   * Remove obsolete Debian version patch.
   * Add a Debian specific set of tests.
+  * Update standards to 4.1.4.  No changes required.
 
  -- Bill MacAllister <bill@ca-zephyr.org>  Thu, 24 Dec 2020 07:05:24 +0000
 
