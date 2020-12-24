@@ -1,0 +1,3673 @@
+Tests specific to a Debian package building environment.  The tests
+start by standing up a LDAP server and running queries against the
+server.
+Index: libnet-ldapapi-perl/tests/data/config_footer.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/config_footer.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,31 @@
++dn: olcBackend={0}mdb,cn=config
++objectClass: olcBackendConfig
++olcBackend: {0}mdb
++structuralObjectClass: olcBackendConfig
++
++dn: olcDatabase={-1}frontend,cn=config
++objectClass: olcDatabaseConfig
++objectClass: olcFrontendConfig
++olcDatabase: {-1}frontend
++olcAccess: {0}to dn.base="" by * read
++olcAccess: {1}to dn.subtree="cn=schema,cn=config" by * read
++olcSizeLimit: 5000
++structuralObjectClass: olcDatabaseConfig
++
++dn: olcDatabase={0}config,cn=config
++objectClass: olcDatabaseConfig
++olcDatabase: {0}config
++olcAccess: {0}to * by * read by anonymous read
++structuralObjectClass: olcDatabaseConfig
++
++dn: olcDatabase=mdb,cn=config
++objectClass: olcDatabaseConfig
++objectClass: olcMdbConfig
++olcDatabase: mdb
++OlcDbMaxSize: 1073741824
++olcSuffix: dc=test,dc=com
++olcRootDN: cn=Manager,dc=test,dc=com
++olcRootPW: secret
++olcDbIndex: objectClass eq
++olcAccess: to * by anonymous write by * write
++olcDbDirectory: testDBDIRtest
+Index: libnet-ldapapi-perl/tests/data/config_header.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/config_header.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,22 @@
++dn: cn=config
++objectClass: olcGlobal
++cn: config
++olcArgsFile: testARGStest
++olcIndexSubstrIfMaxLen: 4
++olcIndexSubstrIfMinLen: 2
++olcIndexSubstrAnyLen: 4
++olcIndexSubstrAnyStep: 2
++olcIndexIntLen: 4
++olcLogLevel: Config
++olcLogLevel: Stats
++olcPidFile: testPIDFILEtest
++
++dn: cn=module{0},cn=config
++objectClass: olcModuleList
++cn: module{0}
++olcModulePath: /usr/lib/ldap
++olcModuleLoad: {0}back_mdb
++
++dn: cn=schema,cn=config
++objectClass: olcSchemaConfig
++cn: schema
+Index: libnet-ldapapi-perl/tests/data/people.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/people.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,557 @@
++dn: dc=test,dc=com
++objectClass: organization
++objectClass: dcObject
++objectClass: top
++o: Test LDAP Directory
++dc: test
++
++dn: cn=people,dc=test,dc=com
++objectClass: top
++objectClass: organizationalRole
++cn: people
++description: User Entries
++
++dn: uid=mac,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++cn: Billy
++uid: mac
++uidNumber: 2000
++gidNumber: 2000
++homeDirectory: /home/mac
++loginShell: /bin/bash
++
++dn: uid=mir,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++cn: Miriam
++uid: mir
++homeDirectory: /home/mir
++gidNumber: 2003
++uidNumber: 2003
++loginShell: /bin/bash
++
++dn: uid=jessie,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++cn: Jessie
++uid: jessie
++gidNumber: 2001
++uidNumber: 2001
++homeDirectory: /home/jessie
++loginShell: /bin/bash
++
++dn: uid=lis,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++gidNumber: 2002
++loginShell: /bin/tcsh
++uid: lis
++uidNumber: 2002
++cn: Lis-Mariel
++homeDirectory: /home/ldubois
++
++dn: uid=rla,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++gidNumber: 3001
++uid: rla
++uidNumber: 3001
++cn: Rick
++loginShell: /bin/ksh
++homeDirectory: /home/rla
++
++dn: uid=keir,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++uid: keir
++cn: Keir
++gidNumber: 2100
++uidNumber: 2100
++homeDirectory: /home/keir
++loginShell: /bin/bash
++
++dn: uid=bryn,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++gidNumber: 3005
++homeDirectory: /home/bryn
++loginShell: /bin/tcsh
++uid: bryn
++uidNumber: 3005
++cn: Bryn
++
++dn: uid=linda,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: linda
++cn: Linda
++homeDirectory: /home/linda
++loginShell: /bin/bash
++uidNumber: 4035
++gidNumber: 4035
++
++dn: uid=steven,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: steven
++cn: Steven
++homeDirectory: /home/steven
++loginShell: /bin/bash
++uidNumber: 4037
++gidNumber: 4037
++
++dn: uid=mike,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: mike
++cn: Mike
++homeDirectory: /home/mike
++loginShell: /bin/bash
++uidNumber: 4046
++gidNumber: 4046
++
++dn: uid=molly,cn=people,dc=test,dc=com
++cn: Molly
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++uid: molly
++homeDirectory: /home/molly
++loginShell: /bin/tcsh
++uidNumber: 4001
++gidNumber: 4001
++
++dn: uid=ted,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: ted
++cn: Ted
++homeDirectory: /home/ted
++loginShell: /bin/bash
++uidNumber: 4044
++gidNumber: 4044
++
++dn: uid=todd,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: todd
++cn: Todd
++homeDirectory: /home/todd
++loginShell: /bin/bash
++uidNumber: 4019
++gidNumber: 4019
++
++dn: uid=bill,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: bill
++cn: Bill
++homeDirectory: /home/bill
++loginShell: /bin/bash
++uidNumber: 4043
++gidNumber: 4043
++
++dn: uid=karla,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: karla
++cn: karla
++loginShell: /bin/tcsh
++uidNumber: 4003
++gidNumber: 4003
++homeDirectory: /home/karla
++
++dn: uid=amee,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: amee
++cn: Amee
++loginShell: /bin/tcsh
++uidNumber: 4004
++gidNumber: 4004
++homeDirectory: /home/amee
++
++dn: uid=betsy,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: betsy
++cn: Betsy
++homeDirectory: /home/betsy
++loginShell: /bin/tcsh
++uidNumber: 4016
++gidNumber: 4016
++
++dn: uid=bear,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: bear
++cn: Bear
++loginShell: /bin/bash
++uidNumber: 4006
++gidNumber: 4006
++homeDirectory: /home/bear
++
++dn: uid=diane,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++uid: diane
++cn: Diane
++homeDirectory: /home/diane
++loginShell: /bin/bash
++uidNumber: 4011
++gidNumber: 4011
++
++dn: uid=bob,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++uid: bob
++cn: Robert
++cn: Bob
++homeDirectory: /home/bobn
++loginShell: /bin/bash
++uidNumber: 4007
++gidNumber: 4007
++
++dn: uid=candy,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++uid: candy
++cn: Candy
++homeDirectory: /home/candy
++uidNumber: 4008
++gidNumber: 4008
++loginShell: /bin/bash
++
++dn: uid=kim,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++uid: kim
++cn: Kim
++homeDirectory: /home/kim
++loginShell: /bin/tcsh
++uidNumber: 4017
++gidNumber: 4017
++
++dn: uid=bron,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: bron
++cn: Bronwen
++homeDirectory: /home/bron
++loginShell: /bin/bash
++uidNumber: 4021
++gidNumber: 4021
++
++dn: uid=tracy,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: tracy
++cn: Tracy
++homeDirectory: /home/tracy
++loginShell: /bin/bash
++uidNumber: 4042
++gidNumber: 4042
++
++dn: uid=delaine,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: delaine
++cn: Delaine
++homeDirectory: /home/delaine
++loginShell: /bin/bash
++uidNumber: 4028
++gidNumber: 4028
++
++dn: uid=marty,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: marty
++cn: Marty
++homeDirectory: /home/marty
++loginShell: /bin/bash
++uidNumber: 4039
++gidNumber: 4039
++
++dn: uid=lonisue,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: lonisue
++cn: Loni Sue
++homeDirectory: /home/lonisue
++loginShell: /bin/bash
++uidNumber: 4036
++gidNumber: 4036
++
++dn: uid=christopher,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: christopher
++cn: Christoper
++homeDirectory: /home/christopher
++loginShell: /bin/bash
++uidNumber: 4045
++gidNumber: 4045
++
++dn: uid=finley,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++uid: finley
++cn: Finley
++homeDirectory: /home/finley
++uidNumber: 4013
++gidNumber: 4013
++loginShell: /bin/bash
++
++dn: uid=linda,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: linda
++cn: Linda
++homeDirectory: /home/linda
++loginShell: /bin/bash
++uidNumber: 4031
++gidNumber: 4031
++
++dn: uid=tyler,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: tyler
++cn: Tyler
++homeDirectory: /home/tyler
++loginShell: /bin/tcsh
++uidNumber: 4014
++gidNumber: 4014
++
++dn: uid=jeff,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++homeDirectory: /home/jeff
++loginShell: /bin/tcsh
++uid: jeff
++cn: Jefferson
++uidNumber: 4015
++gidNumber: 4015
++
++dn: uid=taylor,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: taylor
++cn: Taylor
++homeDirectory: /home/taylor
++loginShell: /bin/bash
++uidNumber: 4040
++gidNumber: 4040
++
++dn: uid=amanda,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: amanda
++cn: Amanda
++homeDirectory: /home/amanda
++loginShell: /bin/bash
++uidNumber: 4041
++gidNumber: 4041
++
++dn: uid=janelle,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: janelle
++cn: Janelle
++homeDirectory: /home/janelle
++loginShell: /bin/bash
++uidNumber: 4038
++gidNumber: 4038
++
++dn: uid=kelsey,cn=people,dc=test,dc=com
++uid: kelsey
++uidNumber: 4012
++gidNumber: 4012
++cn: Kelsey
++loginShell: /bin/bash
++homeDirectory: /home/kelsey
++objectClass: top
++objectClass: person
++objectClass: inetOrgPerson
++objectClass: posixAccount
++objectClass: shadowAccount
++objectClass: krb5Principal
++
++dn: uid=franci,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++uid: franci
++cn: Franci
++cn: Frances A
++homeDirectory: /home/franci
++loginShell: /bin/bash
++uidNumber: 4020
++gidNumber: 4020
++
++dn: uid=david,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++homeDirectory: /home/david
++loginShell: /bin/bash
++uid: david
++cn: David
++uidNumber: 4022
++gidNumber: 4022
++
++dn: uid=birgit,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++homeDirectory: /home/birgit
++loginShell: /bin/bash
++uid: birgit
++cn: birgit
++uidNumber: 4024
++gidNumber: 4024
++
++dn: uid=joel,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++homeDirectory: /home/joel
++loginShell: /bin/bash
++uid: joel
++cn: Joel
++uidNumber: 4030
++gidNumber: 4030
++
++dn: uid=rosemary,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++homeDirectory: /home/rosemary
++loginShell: /bin/bash
++uid: rosemary
++cn: Rosemary
++uidNumber: 4033
++gidNumber: 4033
++
++dn: uid=susie,cn=people,dc=test,dc=com
++objectClass: top
++objectClass: person
++objectClass: krb5Principal
++objectClass: posixAccount
++objectClass: shadowAccount
++homeDirectory: /home/susie
++loginShell: /bin/bash
++uid: susie
++cn: susie
++uidNumber: 4034
++gidNumber: 4034
++
+Index: libnet-ldapapi-perl/tests/data/schema_core.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/schema_core.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,559 @@
++dn: cn=core,cn=schema,cn=config
++objectClass: olcSchemaConfig
++cn: core
++olcAttributeTypes: {0}( 2.5.4.2
++  NAME 'knowledgeInformation'
++  DESC 'RFC2256: knowledge information'
++  EQUALITY caseIgnoreMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{32768} )
++olcAttributeTypes: {1}( 2.5.4.4
++  NAME ( 'sn' 'surname' )
++  DESC 'RFC2256: last (family) name(s) for which the entity is known by'
++  SUP name )
++olcAttributeTypes: {2}( 2.5.4.5
++  NAME 'serialNumber'
++  DESC 'RFC2256: serial number of the entity'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.44{64} )
++olcAttributeTypes: {3}( 2.5.4.6
++  NAME ( 'c' 'countryName' )
++  DESC 'RFC4519: two-letter ISO-3166 country code'
++  SUP name
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.11 SINGLE-VALUE )
++olcAttributeTypes: {4}( 2.5.4.7
++  NAME ( 'l' 'localityName' )
++  DESC 'RFC2256: locality which this object resides in'
++  SUP name )
++olcAttributeTypes: {5}( 2.5.4.8
++  NAME ( 'st' 'stateOrProvinceName' )
++  DESC 'RFC2256: state or province which this object resides in'
++  SUP name )
++olcAttributeTypes: {6}( 2.5.4.9
++  NAME ( 'street' 'streetAddress' )
++  DESC 'RFC2256: street address of this object'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{128} )
++olcAttributeTypes: {7}( 2.5.4.10
++  NAME ( 'o' 'organizationName' )
++  DESC 'RFC2256: organization this object belongs to'
++  SUP name )
++olcAttributeTypes: {8}( 2.5.4.11
++  NAME ( 'ou' 'organizationalUnitName' )
++  DESC 'RFC2256: organizational unit this object belongs to'
++  SUP name )
++olcAttributeTypes: {9}( 2.5.4.12
++  NAME 'title'
++  DESC 'RFC2256: title associated with the entity'
++  SUP name )
++olcAttributeTypes: {10}( 2.5.4.14
++  NAME 'searchGuide'
++  DESC 'RFC2256: search guide, deprecated by enhancedSearchGuide'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.25 )
++olcAttributeTypes: {11}( 2.5.4.15
++  NAME 'businessCategory'
++  DESC 'RFC2256: business category'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{128} )
++olcAttributeTypes: {12}( 2.5.4.16
++  NAME 'postalAddress'
++  DESC 'RFC2256: postal address'
++  EQUALITY caseIgnoreListMatch
++  SUBSTR caseIgnoreListSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.41 )
++olcAttributeTypes: {13}( 2.5.4.17
++  NAME 'postalCode'
++  DESC 'RFC2256: postal code'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{40} )
++olcAttributeTypes: {14}( 2.5.4.18
++  NAME 'postOfficeBox'
++  DESC 'RFC2256: Post Office Box'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{40} )
++olcAttributeTypes: {15}( 2.5.4.19
++  NAME 'physicalDeliveryOfficeName'
++  DESC 'RFC2256: Physical Delivery Office Name'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{128} )
++olcAttributeTypes: {16}( 2.5.4.20
++  NAME 'telephoneNumber'
++  DESC 'RFC2256: Telephone Number'
++  EQUALITY telephoneNumberMatch
++  SUBSTR telephoneNumberSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.50{32} )
++olcAttributeTypes: {17}( 2.5.4.21
++  NAME 'telexNumber'
++  DESC 'RFC2256: Telex Number'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.52 )
++olcAttributeTypes: {18}( 2.5.4.22
++  NAME 'teletexTerminalIdentifier'
++  DESC 'RFC2256: Teletex Terminal Identifier'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.51 )
++olcAttributeTypes: {19}( 2.5.4.23
++  NAME ( 'facsimileTelephoneNumber' 'fax' )
++  DESC 'RFC2256: Facsimile (Fax) Telephone Number'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.22 )
++olcAttributeTypes: {20}( 2.5.4.24
++  NAME 'x121Address'
++  DESC 'RFC2256: X.121 Address'
++  EQUALITY numericStringMatch
++  SUBSTR numericStringSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{15} )
++olcAttributeTypes: {21}( 2.5.4.25
++  NAME 'internationaliSDNNumber'
++  DESC 'RFC2256: international ISDN number'
++  EQUALITY numericStringMatch
++  SUBSTR numericStringSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{16} )
++olcAttributeTypes: {22}( 2.5.4.26
++  NAME 'registeredAddress'
++  DESC 'RFC2256: registered postal address'
++  SUP postalAddress
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.41 )
++olcAttributeTypes: {23}( 2.5.4.27
++  NAME 'destinationIndicator'
++  DESC 'RFC2256: destination indicator'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.44{128} )
++olcAttributeTypes: {24}( 2.5.4.28
++  NAME 'preferredDeliveryMethod'
++  DESC 'RFC2256: preferred delivery method'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.14 SINGLE-VALUE )
++olcAttributeTypes: {25}( 2.5.4.29
++  NAME 'presentationAddress'
++  DESC 'RFC2256: presentation address'
++  EQUALITY presentationAddressMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.43 SINGLE-VALUE )
++olcAttributeTypes: {26}( 2.5.4.30
++  NAME 'supportedApplicationContext'
++  DESC 'RFC2256: supported application context'
++  EQUALITY objectIdentifierMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
++olcAttributeTypes: {27}( 2.5.4.31
++  NAME 'member'
++  DESC 'RFC2256: member of a group'
++  SUP distinguishedName )
++olcAttributeTypes: {28}( 2.5.4.32
++  NAME 'owner'
++  DESC 'RFC2256: owner (of the object)'
++  SUP distinguishedName )
++olcAttributeTypes: {29}( 2.5.4.33
++  NAME 'roleOccupant'
++  DESC 'RFC2256: occupant of role'
++  SUP distinguishedName )
++olcAttributeTypes: {30}( 2.5.4.36
++  NAME 'userCertificate'
++  DESC 'RFC2256: X.509 user certificate, use ;binary'
++  EQUALITY certificateExactMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.8 )
++olcAttributeTypes: {31}( 2.5.4.37
++  NAME 'cACertificate'
++  DESC 'RFC2256: X.509 CA certificate, use ;binary'
++  EQUALITY certificateExactMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.8 )
++olcAttributeTypes: {32}( 2.5.4.38
++  NAME 'authorityRevocationList'
++  DESC 'RFC2256: X.509 authority revocation list, use ;binary'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.9 )
++olcAttributeTypes: {33}( 2.5.4.39
++  NAME 'certificateRevocationList'
++  DESC 'RFC2256: X.509 certificate revocation list, use ;binary'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.9 )
++olcAttributeTypes: {34}( 2.5.4.40
++  NAME 'crossCertificatePair'
++  DESC 'RFC2256: X.509 cross certificate pair, use ;binary'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.10 )
++olcAttributeTypes: {35}( 2.5.4.42
++  NAME ( 'givenName' 'gn' )
++  DESC 'RFC2256: first name(s) for which the entity is known by'
++  SUP name )
++olcAttributeTypes: {36}( 2.5.4.43
++  NAME 'initials'
++  DESC 'RFC2256: initials of some or all of names, but not the surname(s).'
++  SUP name )
++olcAttributeTypes: {37}( 2.5.4.44
++  NAME 'generationQualifier'
++  DESC 'RFC2256: name qualifier indicating a generation'
++  SUP name )
++olcAttributeTypes: {38}( 2.5.4.45
++  NAME 'x500UniqueIdentifier'
++  DESC 'RFC2256: X.500 unique identifier'
++  EQUALITY bitStringMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.6 )
++olcAttributeTypes: {39}( 2.5.4.46
++  NAME 'dnQualifier'
++  DESC 'RFC2256: DN qualifier'
++  EQUALITY caseIgnoreMatch ORDERING caseIgnoreOrderingMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.44 )
++olcAttributeTypes: {40}( 2.5.4.47
++  NAME 'enhancedSearchGuide'
++  DESC 'RFC2256: enhanced search guide'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.21 )
++olcAttributeTypes: {41}( 2.5.4.48
++  NAME 'protocolInformation'
++  DESC 'RFC2256: protocol information'
++  EQUALITY protocolInformationMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.42 )
++olcAttributeTypes: {42}( 2.5.4.50
++  NAME 'uniqueMember'
++  DESC 'RFC2256: unique member of a group'
++  EQUALITY uniqueMemberMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.34 )
++olcAttributeTypes: {43}( 2.5.4.51
++  NAME 'houseIdentifier'
++  DESC 'RFC2256: house identifier'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{32768} )
++olcAttributeTypes: {44}( 2.5.4.52
++  NAME 'supportedAlgorithms'
++  DESC 'RFC2256: supported algorithms'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.49 )
++olcAttributeTypes: {45}( 2.5.4.53
++  NAME 'deltaRevocationList'
++  DESC 'RFC2256: delta revocation list; use ;binary'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.9 )
++olcAttributeTypes: {46}( 2.5.4.54
++  NAME 'dmdName'
++  DESC 'RFC2256: name of DMD'
++  SUP name )
++olcAttributeTypes: {47}( 2.5.4.65
++  NAME 'pseudonym'
++  DESC 'X.520(4th): pseudonym for the object'
++  SUP name )
++olcAttributeTypes: {48}( 0.9.2342.19200300.100.1.3
++  NAME ( 'mail' 'rfc822Mailbox' )
++  DESC 'RFC1274: RFC822 Mailbox'
++  EQUALITY caseIgnoreIA5Match
++  SUBSTR caseIgnoreIA5SubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
++olcAttributeTypes: {49}( 0.9.2342.19200300.100.1.25
++  NAME ( 'dc' 'domainComponent' )
++  DESC 'RFC1274/2247: domain component'
++  EQUALITY caseIgnoreIA5Match
++  SUBSTR caseIgnoreIA5SubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
++olcAttributeTypes: {50}( 0.9.2342.19200300.100.1.37
++  NAME 'associatedDomain'
++  DESC 'RFC1274: domain associated with object'
++  EQUALITY caseIgnoreIA5Match
++  SUBSTR caseIgnoreIA5SubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {51}( 1.2.840.113549.1.9.1
++  NAME ( 'email' 'emailAddress' 'pkcs9email' )
++  DESC 'RFC3280: legacy attribute for email addresses in DNs'
++  EQUALITY caseIgnoreIA5Match
++  SUBSTR caseIgnoreIA5SubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{128} )
++olcObjectClasses: {0}( 2.5.6.2
++  NAME 'country'
++  DESC 'RFC2256: a country'
++  SUP top STRUCTURAL
++  MUST c
++  MAY ( searchGuide
++  $ description ) )
++olcObjectClasses: {1}( 2.5.6.3
++  NAME 'locality'
++  DESC 'RFC2256: a locality'
++  SUP top STRUCTURAL
++  MAY ( street
++  $ seeAlso
++  $ searchGuide
++  $ st
++  $ l
++  $ description ) )
++olcObjectClasses: {2}( 2.5.6.4
++  NAME 'organization'
++  DESC 'RFC2256: an organization'
++  SUP top STRUCTURAL
++  MUST o
++  MAY ( userPassword
++  $ searchGuide
++  $ seeAlso
++  $ businessCategory
++  $ x121Address
++  $ registeredAddress
++  $ destinationIndicator
++  $ preferredDeliveryMethod
++  $ telexNumber
++  $ teletexTerminalIdentifier
++  $ telephoneNumber
++  $ internationaliSDNNumber
++  $  facsimileTelephoneNumber
++  $ street
++  $ postOfficeBox
++  $ postalCode
++  $ postalAddress
++  $ physicalDeliveryOfficeName
++  $ st
++  $ l
++  $ description ) )
++olcObjectClasses: {3}( 2.5.6.5
++  NAME 'organizationalUnit'
++  DESC 'RFC2256: an organizational unit'
++  SUP top STRUCTURAL
++  MUST ou
++  MAY ( userPassword
++  $ searchGuide
++  $ seeAlso
++  $ businessCategory
++  $ x121Address
++  $ registeredAddress
++  $ destinationIndicator
++  $ preferredDeliveryMethod
++  $ telexNumber
++  $ teletexTerminalIdentifier
++  $ telephoneNumber
++  $ internationaliSDNNumber
++  $ facsimileTelephoneNumber
++  $ street
++  $ postOfficeBox
++  $ postalCode
++  $ postalAddress
++  $ physicalDeliveryOfficeName
++  $ st
++  $ l
++  $ description ) )
++olcObjectClasses: {4}( 2.5.6.6
++  NAME 'person'
++  DESC 'RFC2256: a person'
++  SUP top STRUCTURAL
++  MUST ( sn
++  $ cn )
++  MAY ( userPassword
++  $ telephoneNumber
++  $ seeAlso
++  $ description ) )
++olcObjectClasses: {5}( 2.5.6.7
++  NAME 'organizationalPerson'
++  DESC 'RFC2256: an organizational person'
++  SUP person STRUCTURAL
++  MAY ( title
++  $ x121Address
++  $ registeredAddress
++  $ destinationIndicator
++  $ preferredDeliveryMethod
++  $ telexNumber
++  $ teletexTerminalIdentifier
++  $ telephoneNumber
++  $ internationaliSDNNumber
++  $  facsimileTelephoneNumber
++  $ street
++  $ postOfficeBox
++  $ postalCode
++  $ postalAddress
++  $ physicalDeliveryOfficeName
++  $ ou
++  $ st
++  $ l ) )
++olcObjectClasses: {6}( 2.5.6.8
++  NAME 'organizationalRole'
++  DESC 'RFC2256: an organizational role'
++  SUP top STRUCTURAL
++  MUST cn
++  MAY ( x121Address
++  $ registeredAddress
++  $ destinationIndicator
++  $ preferredDeliveryMethod
++  $ telexNumber
++  $ teletexTerminalIdentifier
++  $ telephoneNumber
++  $ internationaliSDNNumber
++  $ facsimileTelephoneNumber
++  $ seeAlso
++  $ roleOccupant
++  $ preferredDeliveryMethod
++  $ street
++  $ postOfficeBox
++  $ postalCode
++  $ postalAddress
++  $ physicalDeliveryOfficeName
++  $ ou
++  $ st
++  $ l
++  $ description ) )
++olcObjectClasses: {7}( 2.5.6.9
++  NAME 'groupOfNames'
++  DESC 'RFC2256: a group of names (DNs)'
++  SUP top STRUCTURAL
++  MUST ( member
++  $ cn )
++  MAY ( businessCategory
++  $ seeAlso
++  $ owner
++  $ ou
++  $ o
++  $ description ) )
++olcObjectClasses: {8}( 2.5.6.10
++  NAME 'residentialPerson'
++  DESC 'RFC2256: an residential person'
++  SUP person STRUCTURAL
++  MUST l
++  MAY ( businessCategory
++  $ x121Address
++  $ registeredAddress
++  $ destinationIndicator
++  $ preferredDeliveryMethod
++  $ telexNumber
++  $ teletexTerminalIdentifier
++  $ telephoneNumber
++  $ internationaliSDNNumber
++  $ facsimileTelephoneNumber
++  $ preferredDeliveryMethod
++  $ street
++  $ postOfficeBox
++  $ postalCode
++  $ postalAddress
++  $ physicalDeliveryOfficeName
++  $ st
++  $ l ) )
++olcObjectClasses: {9}( 2.5.6.11
++  NAME 'applicationProcess'
++  DESC 'RFC2256: an application process'
++  SUP top STRUCTURAL
++  MUST cn
++  MAY ( seeAlso
++  $ ou
++  $ l
++  $ description ) )
++olcObjectClasses: {10}( 2.5.6.12
++  NAME 'applicationEntity'
++  DESC 'RFC2256: an application entity'
++  SUP top STRUCTURAL
++  MUST ( presentationAddress
++  $ cn )
++  MAY ( supportedApplicationContext
++  $ seeAlso
++  $ ou
++  $ o
++  $ l
++  $ description ) )
++olcObjectClasses: {11}( 2.5.6.13
++  NAME 'dSA'
++  DESC 'RFC2256: a directory system agent (a server)'
++  SUP applicationEntity STRUCTURAL
++  MAY knowledgeInformation )
++olcObjectClasses: {12}( 2.5.6.14
++  NAME 'device'
++  DESC 'RFC2256: a device'
++  SUP top STRUCTURAL
++  MUST cn
++  MAY ( serialNumber
++  $ seeAlso
++  $ owner
++  $ ou
++  $ o
++  $ l
++  $ description ) )
++olcObjectClasses: {13}( 2.5.6.15
++  NAME 'strongAuthenticationUser'
++  DESC 'RFC2256: a strong authentication user'
++  SUP top AUXILIARY
++  MUST userCertificate )
++olcObjectClasses: {14}( 2.5.6.16
++  NAME 'certificationAuthority'
++  DESC 'RFC2256: a certificate authority'
++  SUP top AUXILIARY
++  MUST ( authorityRevocationList
++  $ certificateRevocationList
++  $ cACertificate )
++  MAY crossCertificatePair )
++olcObjectClasses: {15}( 2.5.6.17
++  NAME 'groupOfUniqueNames'
++  DESC 'RFC2256: a group of unique names (DN and Unique Identifier)'
++  SUP top STRUCTURAL
++  MUST ( uniqueMember
++  $ cn )
++  MAY ( businessCategory
++  $ seeAlso
++  $ owner
++  $ ou
++  $ o
++  $ description ) )
++olcObjectClasses: {16}( 2.5.6.18
++  NAME 'userSecurityInformation'
++  DESC 'RFC2256: a user security information'
++  SUP top AUXILIARY
++  MAY ( supportedAlgorithms ) )
++olcObjectClasses: {17}( 2.5.6.16.2
++  NAME 'certificationAuthority-V2'
++  SUP certificationAuthority AUXILIARY
++  MAY ( deltaRevocationList ) )
++olcObjectClasses: {18}( 2.5.6.19
++  NAME 'cRLDistributionPoint'
++  SUP top STRUCTURAL
++  MUST ( cn )
++  MAY ( certificateRevocationList
++  $ authorityRevocationList
++  $ deltaRevocationList ) )
++olcObjectClasses: {19}( 2.5.6.20
++  NAME 'dmd'
++  SUP top STRUCTURAL
++  MUST ( dmdName )
++  MAY ( userPassword
++  $ searchGuide
++  $ seeAlso
++  $ businessCategory
++  $ x121Address
++  $ registeredAddress
++  $ destinationIndicator
++  $ preferredDeliveryMethod
++  $ telexNumber
++  $ teletexTerminalIdentifier
++  $ telephoneNumber
++  $ internationaliSDNNumber
++  $ facsimileTelephoneNumber
++  $ street
++  $ postOfficeBox
++  $ postalCode
++  $ postalAddress
++  $ physicalDeliveryOfficeName
++  $ st
++  $ l
++  $ description ) )
++olcObjectClasses: {20}( 2.5.6.21
++  NAME 'pkiUser'
++  DESC 'RFC2587: a PKI user'
++  SUP top AUXILIARY
++  MAY userCertificate )
++olcObjectClasses: {21}( 2.5.6.22
++  NAME 'pkiCA'
++  DESC 'RFC2587: PKI certificate authority'
++  SUP top AUXILIARY
++  MAY ( authorityRevocationList
++  $ certificateRevocationList
++  $ cACertificate
++  $ crossCertificatePair ) )
++olcObjectClasses: {22}( 2.5.6.23
++  NAME 'deltaCRL'
++  DESC 'RFC2587: PKI user'
++  SUP top AUXILIARY
++  MAY deltaRevocationList )
++olcObjectClasses: {23}( 1.3.6.1.4.1.250.3.15
++  NAME 'labeledURIObject'
++  DESC 'RFC2079: object that contains the URI attribute type'
++  MAY ( labeledURI )
++  SUP top AUXILIARY )
++olcObjectClasses: {24}( 0.9.2342.19200300.100.4.19
++  NAME 'simpleSecurityObject'
++  DESC 'RFC1274: simple security object'
++  SUP top AUXILIARY
++  MUST userPassword )
++olcObjectClasses: {25}( 1.3.6.1.4.1.1466.344
++  NAME 'dcObject'
++  DESC 'RFC2247: domain component object'
++  SUP top AUXILIARY
++  MUST dc )
++olcObjectClasses: {26}( 1.3.6.1.1.3.1
++  NAME 'uidObject'
++  DESC 'RFC2377: uid object'
++  SUP top AUXILIARY
++  MUST uid )
+Index: libnet-ldapapi-perl/tests/data/schema_cosine.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/schema_cosine.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,352 @@
++dn: cn=cosine,cn=schema,cn=config
++objectClass: olcSchemaConfig
++cn: cosine
++olcAttributeTypes: {0}( 0.9.2342.19200300.100.1.2
++  NAME 'textEncodedORAddress'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {1}( 0.9.2342.19200300.100.1.4
++  NAME 'info'
++  DESC 'RFC1274: general information'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{2048} )
++olcAttributeTypes: {2}( 0.9.2342.19200300.100.1.5
++  NAME ( 'drink' 'favouriteDrink' )
++  DESC 'RFC1274: favorite drink'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {3}( 0.9.2342.19200300.100.1.6
++  NAME 'roomNumber'
++  DESC 'RFC1274: room number'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {4}( 0.9.2342.19200300.100.1.7
++  NAME 'photo'
++  DESC 'RFC1274: photo (G3 fax)'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.23{25000} )
++olcAttributeTypes: {5}( 0.9.2342.19200300.100.1.8
++  NAME 'userClass'
++  DESC 'RFC1274: category of user'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {6}( 0.9.2342.19200300.100.1.9
++  NAME 'host'
++  DESC 'RFC1274: host computer'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {7}( 0.9.2342.19200300.100.1.10
++  NAME 'manager'
++  DESC 'RFC1274: DN of manager'
++  EQUALITY distinguishedNameMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
++olcAttributeTypes: {8}( 0.9.2342.19200300.100.1.11
++  NAME 'documentIdentifier'
++  DESC 'RFC1274: unique identifier of document'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {9}( 0.9.2342.19200300.100.1.12
++  NAME 'documentTitle'
++  DESC 'RFC1274: title of document'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {10}( 0.9.2342.19200300.100.1.13
++  NAME 'documentVersion'
++  DESC 'RFC1274: version of document'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {11}( 0.9.2342.19200300.100.1.14
++  NAME 'documentAuthor'
++  DESC 'RFC1274: DN of author of document'
++  EQUALITY distinguishedNameMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
++olcAttributeTypes: {12}( 0.9.2342.19200300.100.1.15
++  NAME 'documentLocation'
++  DESC 'RFC1274: location of document original'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {13}( 0.9.2342.19200300.100.1.20
++  NAME ( 'homePhone' 'homeTelephoneNumber' )
++  DESC 'RFC1274: home telephone number'
++  EQUALITY telephoneNumberMatch
++  SUBSTR telephoneNumberSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.50 )
++olcAttributeTypes: {14}( 0.9.2342.19200300.100.1.21
++  NAME 'secretary'
++  DESC 'RFC1274: DN of secretary'
++  EQUALITY distinguishedNameMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
++olcAttributeTypes: {15}( 0.9.2342.19200300.100.1.22
++  NAME 'otherMailbox' SYNTAX 1.3.6.1.4.1.1466.115.121.1.39 )
++olcAttributeTypes: {16}( 0.9.2342.19200300.100.1.26
++  NAME 'aRecord'
++  EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {17}( 0.9.2342.19200300.100.1.27
++  NAME 'mDRecord'
++  EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {18}( 0.9.2342.19200300.100.1.28
++  NAME 'mXRecord'
++  EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {19}( 0.9.2342.19200300.100.1.29
++  NAME 'nSRecord'
++  EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {20}( 0.9.2342.19200300.100.1.30
++  NAME 'sOARecord'
++  EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {21}( 0.9.2342.19200300.100.1.31
++  NAME 'cNAMERecord'
++  EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {22}( 0.9.2342.19200300.100.1.38
++  NAME 'associatedName'
++  DESC 'RFC1274: DN of entry associated with domain'
++  EQUALITY distinguishedNameMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
++olcAttributeTypes: {23}( 0.9.2342.19200300.100.1.39
++  NAME 'homePostalAddress'
++  DESC 'RFC1274: home postal address'
++  EQUALITY caseIgnoreListMatch
++  SUBSTR caseIgnoreListSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.41 )
++olcAttributeTypes: {24}( 0.9.2342.19200300.100.1.40
++  NAME 'personalTitle'
++  DESC 'RFC1274: personal title'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {25}( 0.9.2342.19200300.100.1.41
++  NAME ( 'mobile' 'mobileTelephoneNumber' )
++  DESC 'RFC1274: mobile telephone number'
++  EQUALITY telephoneNumberMatch
++  SUBSTR telephoneNumberSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.50 )
++olcAttributeTypes: {26}( 0.9.2342.19200300.100.1.42
++  NAME ( 'pager' 'pagerTelephoneNumber' )
++  DESC 'RFC1274: pager telephone number'
++  EQUALITY telephoneNumberMatch
++  SUBSTR telephoneNumberSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.50 )
++olcAttributeTypes: {27}( 0.9.2342.19200300.100.1.43
++  NAME ( 'co' 'friendlyCountryName' )
++  DESC 'RFC1274: friendly country name'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
++olcAttributeTypes: {28}( 0.9.2342.19200300.100.1.44
++  NAME 'uniqueIdentifier'
++  DESC 'RFC1274: unique identifer'
++  EQUALITY caseIgnoreMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {29}( 0.9.2342.19200300.100.1.45
++  NAME 'organizationalStatus'
++  DESC 'RFC1274: organizational status'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {30}( 0.9.2342.19200300.100.1.46
++  NAME 'janetMailbox'
++  DESC 'RFC1274: Janet mailbox'
++  EQUALITY caseIgnoreIA5Match
++  SUBSTR caseIgnoreIA5SubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
++olcAttributeTypes: {31}( 0.9.2342.19200300.100.1.47
++  NAME 'mailPreferenceOption'
++  DESC 'RFC1274: mail preference option'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
++olcAttributeTypes: {32}( 0.9.2342.19200300.100.1.48
++  NAME 'buildingName'
++  DESC 'RFC1274: name of building'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
++olcAttributeTypes: {33}( 0.9.2342.19200300.100.1.49
++  NAME 'dSAQuality'
++  DESC 'RFC1274: DSA Quality'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.19 SINGLE-VALUE )
++olcAttributeTypes: {34}( 0.9.2342.19200300.100.1.50
++  NAME 'singleLevelQuality'
++  DESC 'RFC1274: Single Level Quality'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.13 SINGLE-VALUE )
++olcAttributeTypes: {35}( 0.9.2342.19200300.100.1.51
++  NAME 'subtreeMinimumQuality'
++  DESC 'RFC1274: Subtree Mininum Quality'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.13 SINGLE-VALUE )
++olcAttributeTypes: {36}( 0.9.2342.19200300.100.1.52
++  NAME 'subtreeMaximumQuality'
++  DESC 'RFC1274: Subtree Maximun Quality'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.13 SINGLE-VALUE )
++olcAttributeTypes: {37}( 0.9.2342.19200300.100.1.53
++  NAME 'personalSignature'
++  DESC 'RFC1274: Personal Signature (G3 fax)'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.23 )
++olcAttributeTypes: {38}( 0.9.2342.19200300.100.1.54
++  NAME 'dITRedirect'
++  DESC 'RFC1274: DIT Redirect'
++  EQUALITY distinguishedNameMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
++olcAttributeTypes: {39}( 0.9.2342.19200300.100.1.55
++  NAME 'audio'
++  DESC 'RFC1274: audio (u-law)'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.4{25000} )
++olcAttributeTypes: {40}( 0.9.2342.19200300.100.1.56
++  NAME 'documentPublisher'
++  DESC 'RFC1274: publisher of document'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
++olcObjectClasses: {0}( 0.9.2342.19200300.100.4.4
++  NAME ( 'pilotPerson' 'newPilotPerson' )
++  SUP person STRUCTURAL
++  MAY ( userid
++  $ textEncodedORAddress
++  $ rfc822Mailbox
++  $ favouriteDrink
++  $ roomNumber
++  $ userClass
++  $ homeTelephoneNumber
++  $ homePostalAddress
++  $ secretary
++  $ personalTitle
++  $ preferredDeliveryMethod
++  $ businessCategory
++  $ janetMailbox
++  $ otherMailbox
++  $ mobileTelephoneNumber
++  $ pagerTelephoneNumber
++  $ organizationalStatus
++  $ mailPreferenceOption
++  $ personalSignature ) )
++olcObjectClasses: {1}( 0.9.2342.19200300.100.4.5
++  NAME 'account'
++  SUP top STRUCTURAL
++  MUST userid
++  MAY ( description
++  $ seeAlso
++  $ localityName
++  $ organizationName
++  $ organizationalUnitName
++  $ host ) )
++olcObjectClasses: {2}( 0.9.2342.19200300.100.4.6
++  NAME 'document'
++  SUP top STRUCTURAL
++  MUST documentIdentifier
++  MAY ( commonName
++  $ description
++  $ seeAlso
++  $ localityName
++  $ organizationName
++  $ organizationalUnitName
++  $ documentTitle
++  $ documentVersion
++  $ documentAuthor
++  $ documentLocation
++  $ documentPublisher ) )
++olcObjectClasses: {3}( 0.9.2342.19200300.100.4.7
++  NAME 'room'
++  SUP top STRUCTURAL
++  MUST commonName
++  MAY ( roomNumber
++  $ description
++  $ seeAlso
++  $ telephoneNumber ) )
++olcObjectClasses: {4}( 0.9.2342.19200300.100.4.9
++  NAME 'documentSeries'
++  SUP top STRUCTURAL
++  MUST commonName
++  MAY ( description
++  $ seeAlso
++  $ telephonenumber
++  $ localityName
++  $ organizationName
++  $ organizationalUnitName ) )
++olcObjectClasses: {5}( 0.9.2342.19200300.100.4.13
++  NAME 'domain'
++  SUP top STRUCTURAL
++  MUST domainComponent
++  MAY ( associatedName
++  $ organizationName
++  $ description
++  $ businessCategory
++  $ seeAlso
++  $ searchGuide
++  $ userPassword
++  $ localityName
++  $ stateOrProvinceName
++  $ streetAddress
++  $ physicalDeliveryOfficeName
++  $ postalAddress
++  $ postalCode
++  $ postOfficeBox
++  $ streetAddress
++  $ facsimileTelephoneNumber
++  $ internationalISDNNumber
++  $ telephoneNumber
++  $ teletexTerminalIdentifier
++  $ telexNumber
++  $ preferredDeliveryMethod
++  $ destinationIndicator
++  $ registeredAddress
++  $ x121Address ) )
++olcObjectClasses: {6}( 0.9.2342.19200300.100.4.14
++  NAME 'RFC822localPart'
++  SUP domain STRUCTURAL
++  MAY ( commonName
++  $ surname
++  $ description
++  $ seeAlso
++  $ telephoneNumber
++  $ physicalDeliveryOfficeName
++  $ postalAddress
++  $ postalCode
++  $ postOfficeBox
++  $ streetAddress
++  $ facsimileTelephoneNumber
++  $ internationalISDNNumber
++  $ telephoneNumber
++  $ teletexTerminalIdentifier
++  $ telexNumber
++  $ preferredDeliveryMethod
++  $ destinationIndicator
++  $ registeredAddress
++  $ x121Address ) )
++olcObjectClasses: {7}( 0.9.2342.19200300.100.4.15
++  NAME 'dNSDomain'
++  SUP domain STRUCTURAL
++  MAY ( ARecord
++  $ MDRecord
++  $ MXRecord
++  $ NSRecord
++  $ SOARecord
++  $ CNAMERecord ) )
++olcObjectClasses: {8}( 0.9.2342.19200300.100.4.17
++  NAME 'domainRelatedObject'
++  DESC 'RFC1274: an object related to an domain'
++  SUP top AUXILIARY
++  MUST associatedDomain )
++olcObjectClasses: {9}( 0.9.2342.19200300.100.4.18
++  NAME 'friendlyCountry'
++  SUP country STRUCTURAL
++  MUST friendlyCountryName )
++olcObjectClasses: {10}( 0.9.2342.19200300.100.4.20
++  NAME 'pilotOrganization'
++  SUP ( organization
++  $ organizationalUnit ) STRUCTURAL
++  MAY buildingName )
++olcObjectClasses: {11}( 0.9.2342.19200300.100.4.21
++  NAME 'pilotDSA'
++  SUP dsa STRUCTURAL
++  MAY dSAQuality )
++olcObjectClasses: {12}( 0.9.2342.19200300.100.4.22
++  NAME 'qualityLabelledData'
++  SUP top AUXILIARY
++  MUST dsaQuality
++  MAY ( subtreeMinimumQuality
++  $ subtreeMaximumQuality ) )
+Index: libnet-ldapapi-perl/tests/data/schema_inetorgperson.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/schema_inetorgperson.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,82 @@
++dn: cn=inetorgperson,cn=schema,cn=config
++objectClass: olcSchemaConfig
++cn: inetorgperson
++olcAttributeTypes: {0}( 2.16.840.1.113730.3.1.1
++  NAME 'carLicense'
++  DESC 'RFC2798: vehicle license or registration plate'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
++olcAttributeTypes: {1}( 2.16.840.1.113730.3.1.2
++  NAME 'departmentNumber'
++  DESC 'RFC2798: identifies a department within an organization'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
++olcAttributeTypes: {2}( 2.16.840.1.113730.3.1.241
++  NAME 'displayName'
++  DESC 'RFC2798: preferred name to be used when displaying entries'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
++olcAttributeTypes: {3}( 2.16.840.1.113730.3.1.3
++  NAME 'employeeNumber'
++  DESC 'RFC2798: numerically identifies an employee within an organization'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
++olcAttributeTypes: {4}( 2.16.840.1.113730.3.1.4
++  NAME 'employeeType'
++  DESC 'RFC2798: type of employment for a person'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
++olcAttributeTypes: {5}( 0.9.2342.19200300.100.1.60
++  NAME 'jpegPhoto'
++  DESC 'RFC2798: a JPEG image'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.28 )
++olcAttributeTypes: {6}( 2.16.840.1.113730.3.1.39
++  NAME 'preferredLanguage'
++  DESC 'RFC2798: preferred written or spoken language for a person'
++  EQUALITY caseIgnoreMatch
++  SUBSTR caseIgnoreSubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
++olcAttributeTypes: {7}( 2.16.840.1.113730.3.1.40
++  NAME 'userSMIMECertificate'
++  DESC 'RFC2798: PKCS#7 SignedData used to support S/MIME'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.5 )
++olcAttributeTypes: {8}( 2.16.840.1.113730.3.1.216
++  NAME 'userPKCS12'
++  DESC 'RFC2798: personal identity information, a PKCS #12 PFX'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.5 )
++olcObjectClasses: {0}( 2.16.840.1.113730.3.2.2
++  NAME 'inetOrgPerson'
++  DESC 'RFC2798: Internet Organizational Person'
++  SUP organizationalPerson STRUCTURAL
++  MAY ( audio
++  $ businessCategory
++  $ carLicense
++  $ departmentNumber
++  $ displayName
++  $ employeeNumber
++  $ employeeType
++  $ givenName
++  $ homePhone
++  $ homePostalAddress
++  $ initials
++  $ jpegPhoto
++  $ labeledURI
++  $ mail
++  $ manager
++  $ mobile
++  $ o
++  $ pager
++  $ photo
++  $ roomNumber
++  $ secretary
++  $ uid
++  $ userCertificate
++  $ x500uniqueIdentifier
++  $ preferredLanguage
++  $ userSMIMECertificate
++  $ userPKCS12 ) )
+Index: libnet-ldapapi-perl/tests/data/schema_krb5_kdc.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/schema_krb5_kdc.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,66 @@
++dn: cn=krb5-kdc,cn=schema,cn=config
++objectClass: olcSchemaConfig
++cn: krb5-kdc
++olcAttributeTypes: {0}( 1.3.6.1.4.1.5322.10.1.1
++  NAME 'krb5PrincipalName'
++  DESC 'The unparsed Kerberos principal name'
++  EQUALITY caseExactIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
++olcAttributeTypes: {1}( 1.3.6.1.4.1.5322.10.1.2
++  NAME 'krb5KeyVersionNumber'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {2}( 1.3.6.1.4.1.5322.10.1.3
++  NAME 'krb5MaxLife'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {3}( 1.3.6.1.4.1.5322.10.1.4
++  NAME 'krb5MaxRenew'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {4}( 1.3.6.1.4.1.5322.10.1.5
++  NAME 'krb5KDCFlags'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {5}( 1.3.6.1.4.1.5322.10.1.6
++  NAME 'krb5EncryptionType'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
++olcAttributeTypes: {6}( 1.3.6.1.4.1.5322.10.1.7
++  NAME 'krb5ValidStart'
++  EQUALITY generalizedTimeMatch ORDERING generalizedTimeOrderingMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
++olcAttributeTypes: {7}( 1.3.6.1.4.1.5322.10.1.8
++  NAME 'krb5ValidEnd'
++  EQUALITY generalizedTimeMatch ORDERING generalizedTimeOrderingMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
++olcAttributeTypes: {8}( 1.3.6.1.4.1.5322.10.1.9
++  NAME 'krb5PasswordEnd'
++  EQUALITY generalizedTimeMatch ORDERING generalizedTimeOrderingMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
++olcAttributeTypes: {9}( 1.3.6.1.4.1.5322.10.1.10
++  NAME 'krb5Key'
++  DESC 'Encoded ASN1 Key as an octet string'
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.5 )
++olcAttributeTypes: {10}( 1.3.6.1.4.1.5322.10.1.11
++  NAME 'krb5PrincipalRealm'
++  DESC 'Distinguished name of krb5Realm entry'
++  SUP distinguishedName )
++olcAttributeTypes: {11}( 1.3.6.1.4.1.5322.10.1.12
++  NAME 'krb5RealmName'
++  EQUALITY octetStringMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{128} )
++olcObjectClasses: {0}( 1.3.6.1.4.1.5322.10.2.1
++  NAME 'krb5Principal'
++  SUP top AUXILIARY
++  MUST krb5PrincipalName
++  MAY ( cn
++  $ krb5PrincipalRealm ) )
++olcObjectClasses: {1}( 1.3.6.1.4.1.5322.10.2.2
++  NAME 'krb5KDCEntry'
++  SUP krb5Principal AUXILIARY
++  MUST krb5KeyVersionNumber
++  MAY ( krb5ValidStart
++  $ krb5ValidEnd
++  $ krb5PasswordEnd
++  $ krb5MaxLife
++  $ krb5MaxRenew
++  $ krb5KDCFlags
++  $ krb5EncryptionType
++  $ krb5Key ) )
++olcObjectClasses: {2}( 1.3.6.1.4.1.5322.10.2.3
++  NAME 'krb5Realm'
++  SUP top AUXILIARY
++  MUST krb5RealmName )
+Index: libnet-ldapapi-perl/tests/data/schema_nis.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/schema_nis.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,212 @@
++dn: cn=nis,cn=schema,cn=config
++objectClass: olcSchemaConfig
++cn: nis
++olcAttributeTypes: {0}( 1.3.6.1.1.1.1.2
++  NAME 'gecos'
++  DESC 'The GECOS field; the common name'
++  EQUALITY caseIgnoreIA5Match
++  SUBSTR caseIgnoreIA5SubstringsMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
++olcAttributeTypes: {1}( 1.3.6.1.1.1.1.3
++  NAME 'homeDirectory'
++  DESC 'The absolute path to the home directory'
++  EQUALITY caseExactIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
++olcAttributeTypes: {2}( 1.3.6.1.1.1.1.4
++  NAME 'loginShell'
++  DESC 'The path to the login shell'
++  EQUALITY caseExactIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
++olcAttributeTypes: {3}( 1.3.6.1.1.1.1.5
++  NAME 'shadowLastChange'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {4}( 1.3.6.1.1.1.1.6
++  NAME 'shadowMin'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {5}( 1.3.6.1.1.1.1.7
++  NAME 'shadowMax'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {6}( 1.3.6.1.1.1.1.8
++  NAME 'shadowWarning'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {7}( 1.3.6.1.1.1.1.9
++  NAME 'shadowInactive'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {8}( 1.3.6.1.1.1.1.10
++  NAME 'shadowExpire'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {9}( 1.3.6.1.1.1.1.11
++  NAME 'shadowFlag'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {10}( 1.3.6.1.1.1.1.12
++  NAME 'memberUid'
++  EQUALITY caseExactIA5Match
++  SUBSTR caseExactIA5SubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {11}( 1.3.6.1.1.1.1.13
++  NAME 'memberNisNetgroup'
++  EQUALITY caseExactIA5Match
++  SUBSTR caseExactIA5SubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {12}( 1.3.6.1.1.1.1.14
++  NAME 'nisNetgroupTriple'
++  DESC 'Netgroup triple'
++  SYNTAX 1.3.6.1.1.1.0.0 )
++olcAttributeTypes: {13}( 1.3.6.1.1.1.1.15
++  NAME 'ipServicePort'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {14}( 1.3.6.1.1.1.1.16
++  NAME 'ipServiceProtocol'
++  SUP name )
++olcAttributeTypes: {15}( 1.3.6.1.1.1.1.17
++  NAME 'ipProtocolNumber'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {16}( 1.3.6.1.1.1.1.18
++  NAME 'oncRpcNumber'
++  EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
++olcAttributeTypes: {17}( 1.3.6.1.1.1.1.19
++  NAME 'ipHostNumber'
++  DESC 'IP address'
++  EQUALITY caseIgnoreIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{128} )
++olcAttributeTypes: {18}( 1.3.6.1.1.1.1.20
++  NAME 'ipNetworkNumber'
++  DESC 'IP network'
++  EQUALITY caseIgnoreIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{128} SINGLE-VALUE )
++olcAttributeTypes: {19}( 1.3.6.1.1.1.1.21
++  NAME 'ipNetmaskNumber'
++  DESC 'IP netmask'
++  EQUALITY caseIgnoreIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{128} SINGLE-VALUE )
++olcAttributeTypes: {20}( 1.3.6.1.1.1.1.22
++  NAME 'macAddress'
++  DESC 'MAC address'
++  EQUALITY caseIgnoreIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{128} )
++olcAttributeTypes: {21}( 1.3.6.1.1.1.1.23
++  NAME 'bootParameter'
++  DESC 'rpc.bootparamd parameter'
++  SYNTAX 1.3.6.1.1.1.0.1 )
++olcAttributeTypes: {22}( 1.3.6.1.1.1.1.24
++  NAME 'bootFile'
++  DESC 'Boot image name'
++  EQUALITY caseExactIA5Match
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
++olcAttributeTypes: {23}( 1.3.6.1.1.1.1.26
++  NAME 'nisMapName'
++  SUP name )
++olcAttributeTypes: {24}( 1.3.6.1.1.1.1.27
++  NAME 'nisMapEntry'
++  EQUALITY caseExactIA5Match
++  SUBSTR caseExactIA5SubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{1024} SINGLE-VALUE )
++olcObjectClasses: {0}( 1.3.6.1.1.1.2.0
++  NAME 'posixAccount'
++  DESC 'Abstraction of an account with POSIX attributes'
++  SUP top AUXILIARY
++  MUST ( cn
++  $ uid
++  $ uidNumber
++  $ gidNumber
++  $ homeDirectory )
++  MAY ( userPassword
++  $ loginShell
++  $ gecos
++  $ description ) )
++olcObjectClasses: {1}( 1.3.6.1.1.1.2.1
++  NAME 'shadowAccount'
++  DESC 'Additional attributes for shadow passwords'
++  SUP top AUXILIARY
++  MUST uid
++  MAY ( userPassword
++  $ shadowLastChange
++  $ shadowMin
++  $ shadowMax
++  $ shadowWarning
++  $ shadowInactive
++  $ shadowExpire
++  $ shadowFlag
++  $ description ) )
++olcObjectClasses: {2}( 1.3.6.1.1.1.2.2
++  NAME 'posixGroup'
++  DESC 'Abstraction of a group of accounts'
++  SUP top STRUCTURAL
++  MUST ( cn
++  $ gidNumber )
++  MAY ( userPassword
++  $ memberUid
++  $ description ) )
++olcObjectClasses: {3}( 1.3.6.1.1.1.2.3
++  NAME 'ipService'
++  DESC 'Abstraction an Internet Protocol service'
++  SUP top STRUCTURAL
++  MUST ( cn
++  $ ipServicePort
++  $ ipServiceProtocol )
++  MAY description )
++olcObjectClasses: {4}( 1.3.6.1.1.1.2.4
++  NAME 'ipProtocol'
++  DESC 'Abstraction of an IP protocol'
++  SUP top STRUCTURAL
++  MUST ( cn
++  $ ipProtocolNumber
++  $ description )
++  MAY description )
++olcObjectClasses: {5}( 1.3.6.1.1.1.2.5
++  NAME 'oncRpc'
++  DESC 'Abstraction of an ONC/RPC binding'
++  SUP top STRUCTURAL
++  MUST ( cn
++  $ oncRpcNumber
++  $ description )
++  MAY description )
++olcObjectClasses: {6}( 1.3.6.1.1.1.2.6
++  NAME 'ipHost'
++  DESC 'Abstraction of a host, an IP device'
++  SUP top AUXILIARY
++  MUST ( cn
++  $ ipHostNumber )
++  MAY ( l
++  $ description
++  $ manager ) )
++olcObjectClasses: {7}( 1.3.6.1.1.1.2.7
++  NAME 'ipNetwork'
++  DESC 'Abstraction of an IP network'
++  SUP top STRUCTURAL
++  MUST ( cn
++  $ ipNetworkNumber )
++  MAY ( ipNetmaskNumber
++  $ l
++  $ description
++  $ manager ) )
++olcObjectClasses: {8}( 1.3.6.1.1.1.2.8
++  NAME 'nisNetgroup'
++  DESC 'Abstraction of a netgroup'
++  SUP top STRUCTURAL
++  MUST cn
++  MAY ( nisNetgroupTriple
++  $ memberNisNetgroup
++  $ description ) )
++olcObjectClasses: {9}( 1.3.6.1.1.1.2.9
++  NAME 'nisMap'
++  DESC 'A generic abstraction of a NIS map'
++  SUP top STRUCTURAL
++  MUST nisMapName
++  MAY description )
++olcObjectClasses: {10}( 1.3.6.1.1.1.2.10
++  NAME 'nisObject'
++  DESC 'An entry in a NIS map'
++  SUP top STRUCTURAL
++  MUST ( cn
++  $ nisMapEntry
++  $ nisMapName )
++  MAY description )
++olcObjectClasses: {11}( 1.3.6.1.1.1.2.11
++  NAME 'ieee802Device'
++  DESC 'A device with a MAC address'
++  SUP top AUXILIARY
++  MAY macAddress )
++olcObjectClasses: {12}( 1.3.6.1.1.1.2.12
++  NAME 'bootableDevice'
++  DESC 'A device with boot parameters'
++  SUP top AUXILIARY
++  MAY ( bootFile
++  $ bootParameter ) )
+Index: libnet-ldapapi-perl/tests/data/schema_openssh_lpk.ldif
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/data/schema_openssh_lpk.ldif	2020-12-24 07:02:15.678182589 +0000
+@@ -0,0 +1,14 @@
++dn: cn={6}openssh-lpk,cn=schema,cn=config
++objectClass: olcSchemaConfig
++cn: {6}openssh-lpk
++olcAttributeTypes: {0}( 1.3.6.1.4.1.24552.500.1.1.1.13
++  NAME 'sshPublicKey'
++  DESC 'MANDATORY: OpenSSH Public key'
++  EQUALITY octetStringMatch
++  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
++olcObjectClasses: {0}( 1.3.6.1.4.1.24552.500.1.1.2.0
++  NAME 'ldapPublicKey'
++  SUP top AUXILIARY
++  DESC 'MANDATORY: OpenSSH LPK objectclass'
++  MAY ( sshPublicKey
++  $ uid ))
+Index: libnet-ldapapi-perl/tests/libnet-ldapapi.t
+===================================================================
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ libnet-ldapapi-perl/tests/libnet-ldapapi.t	2020-12-24 07:01:45.776619674 +0000
+@@ -0,0 +1,1725 @@
++#!/usr/bin/perl -w
++#
++# tests/libnet-ldapapi.t
++
++use Carp;
++use Getopt::Long;
++use IPC::Run qw( start pump finish run timeout );
++use Net::LDAPapi;
++use strict;
++use Test::More qw( no_plan );
++
++my $opt_debug;
++my $opt_disable;
++
++my $DIR_ROOT    = '../tmp/test-slapd';
++my $DIR_CONFIG  = "$DIR_ROOT/slapd.d";
++my $DIR_DB      = "$DIR_ROOT/db";
++my $FILE_ARGS   = "$DIR_ROOT/slapd.args";
++my $FILE_PID    = "$DIR_ROOT/slapd.pid";
++my $LDIF_CONFIG = "$DIR_ROOT/cn-config.ldif";
++my $LDIF_DB     = "$DIR_ROOT/db.ldif";
++my $URI         = 'ldap://127.0.0.1:9009/';
++
++#########################################################################
++# Subroutines
++#########################################################################
++
++# -----------------------------------------------------------------------
++# print error returns with delimiters to make them more visible
++
++sub print_err {
++    my ($test, $err) = @_;
++    my $txt = "Unexpected output from $test ";
++    my $sz  = 72 - length($txt);
++    if ($sz < 5) {
++        $sz = 5;
++    }
++    my $hdr = $txt . '=' x $sz;
++    print("$hdr\n");
++    print("$err\n");
++    print('=' x 72 . "\n");
++    return;
++}
++
++# -----------------------------------------------------------------------
++# read file
++
++sub read_file {
++    my ($path) = @_;
++    if (!-e $path) {
++        croak "ERROR: file not found $path\n";
++    }
++    open(my $fd, '<', $path) or croak "ERROR: openingfile $path\n";
++    my $s;
++    while (<$fd>) {
++        $s .= $_;
++    }
++    close $fd or croak "ERROR: closing file $path\n";
++    return $s;
++}
++
++# -----------------------------------------------------------------------
++# run a shell command line
++
++sub run_cmd {
++    my @cmd = @_;
++
++    my $return_text = '';
++    my $in;
++    my $out;
++    my $err;
++    if ($opt_debug) {
++        print "\n";
++        print "Executing: " . join(' ', @cmd) . "\n";
++    }
++    eval { run(\@cmd, \$in, \$out, \$err, timeout(30)); };
++    if ($@) {
++        if ($err) {
++            $err .= "\n";
++        }
++        $err .= 'ERROR executing:' . join(q{ }, @cmd) . "\n";
++        $err .= $@;
++        croak "$err\n";
++    }
++    if ($out) {
++        $return_text .= "$out\n";
++    }
++    if ($err) {
++        $return_text .= "ERROR: $err\n";
++    }
++    return $return_text;
++}
++
++# ------------------------------------------------------------------------
++# Create the LDAP configuration file
++
++sub create_config {
++    open(my $fd, '>', $LDIF_CONFIG)
++      or croak "ERROR: writing to $LDIF_CONFIG\n";
++
++    my $header = read_file('data/config_header.ldif');
++    $header =~ s/testPIDFILEtest/$FILE_PID/xms;
++    $header =~ s/testARGStest/$FILE_ARGS/xms;
++
++    my $footer = read_file('data/config_footer.ldif');
++    $footer =~ s/testDBDIRtest/$DIR_DB/xms;
++
++    print $fd $header . "\n";
++    print $fd read_file('data/schema_core.ldif') . "\n";
++    print $fd read_file('data/schema_cosine.ldif') . "\n";
++    print $fd read_file('data/schema_nis.ldif') . "\n";
++    print $fd read_file('data/schema_inetorgperson.ldif') . "\n";
++    print $fd read_file('data/schema_krb5_kdc.ldif') . "\n";
++    print $fd read_file('data/schema_openssh_lpk.ldif') . "\n";
++    print $fd $footer . "\n";
++    close $fd or croak "ERROR: closing $LDIF_CONFIG\n";
++
++    return;
++}
++
++# ------------------------------------------------------------------------
++# Create the inital LDAP database
++
++sub create_db {
++    my $db = read_file('data/people.ldif');
++    open(my $fd, '>', $LDIF_DB) or croak "ERROR: opening $LDIF_DB\n";
++    print $fd $db;
++    close $fd or croak "ERROR: closing $LDIF_DB\n";;
++    return;
++}
++
++# ------------------------------------------------------------------------
++# Clean out old directories if they exists and then create a new
++# empty directories.
++
++sub create_dirs {
++    if (-e $DIR_ROOT) {
++        system("rm -rf $DIR_ROOT");
++    }
++    for my $d ($DIR_CONFIG, $DIR_DB) {
++        system("mkdir -p $d");
++    }
++    return;
++}
++
++#########################################################################
++# Main Routine
++#########################################################################
++
++# Debugging option
++GetOptions(
++    'debug'   => \$opt_debug,
++    'disable' => \$opt_disable
++);
++
++if ($opt_disable) {
++    pass('All tests with an LDAP server disabled');
++    exit;
++}
++
++# ------------------------------------------------------------------------
++# Create test directory
++create_dirs();
++
++# Create the LDAP configuation and add it to the slapd instance
++create_config();
++my @cmd_config = ('/usr/sbin/slapadd',
++          '-b', 'cn=config',
++          '-F', $DIR_CONFIG,
++          '-l', $LDIF_CONFIG);
++run_cmd(@cmd_config);
++
++# Create the top of the directory tree
++create_db();
++my @cmd_db = ('/usr/sbin/slapadd',
++          '-b', 'dc=test,dc=com',
++          '-F', $DIR_CONFIG,
++          '-l', $LDIF_DB);
++run_cmd(@cmd_db);
++
++# ------------------------------------------------------------------------
++# Start slapd server to use for testing
++my $slapd_cmd = "/usr/sbin/slapd -F $DIR_CONFIG -h $URI";
++if ($opt_debug) {
++    print "\n";
++    print "Executing: $slapd_cmd\n";
++}
++system($slapd_cmd);
++sleep 1;
++
++my $t_name;
++my @t_cmd = ();
++my $t_err;
++my @cmd_search = ();
++
++# ------------------------------------------------------------------------
++# Just test to make sure we can talk to the ldap server
++$t_name = 'Initial slapd test';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@cmd_search = ('/usr/bin/ldapsearch',
++                  '-x', '-LLL',
++                  '-H', $URI,
++                  '-b', 'dc=test,dc=com');
++my $t_out = run_cmd(@cmd_search);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    pass($t_name);
++}
++
++##############################################################################
++# Site tests
++##############################################################################
++
++$t_name = 'Site us_test creation using default conf file';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          'add', 'us_test',
++          'comment=Test Site',
++          'primary=us-test-netsrv-01',
++          'primaryip=1.2.3.4',
++          'secondary=us-test-netsrv-02',
++          'secondaryip=1.2.3.5');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ configuration\s+ file\s+ not\s+ found\s+/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site creation by non-admin user';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'us_test',
++          'comment=Test Site',
++          'primary=us-test-netsrv-01',
++          'primaryip=1.2.3.4',
++          'secondary=us-test-netsrv-02',
++          'secondaryip=1.2.3.5');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ access\s+ denied\s+ to\s+/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site creation attempt without server specification';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'us_test',
++          'comment=Test Site');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output form command');
++    fail($t_name);
++} elsif ($t_out =~ /^ERROR:\s+ a\s+ primary\s+ server\s+ is\s+ required/xms) {
++    pass($t_name);
++} else {
++    print($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site creation attempt without server ip specification';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'us_test',
++          'comment=Test Site',
++          'primary=us-test-netsrv-01',
++          'secondary=us-test-netsrv-02');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /^ERROR:\s+ primaryip\s+ is\s+ required\s+/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site creation attempt with duplicate server names';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'us_test',
++          'comment=Test Site',
++          'primary=us-test-netsrv-01',
++          'primaryip=1.2.3.4',
++          'secondary=us-test-netsrv-01',
++          'secondaryip=1.2.3.5');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ server\s+ names\s+ must\s+ be\s+ different/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site creation us_test';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'us_test',
++          'comment=Test Site',
++          'primary=us-test-netsrv-01',
++          'primaryip=1.2.3.4',
++          'secondary=us-test-netsrv-02',
++          'secondaryip=1.2.3.5',
++          'priv=GROUPER:corpsre-team',
++          'v6prefix=2a01:5a20:1');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /INFO:\s+ isc-dhcp-server\s+ restart\s+ required/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site validating search us_test';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++$t_out = run_cmd(@cmd_search);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my $site_dn = 'cn=us_test,cn=net,dc=test,dc=com';
++    my @vals = (
++        "dn: cn=config,$site_dn",
++        "dn: cn=us-test-netsrv-01,$site_dn",
++        "dn: cn=us-test-netsrv-02,$site_dn");
++    for my $v (@vals) {
++        if ($t_out !~ /$v/ms) {
++            $err .= "ERROR: Missing $v\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Site creation us_test2';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'us_test2',
++          'comment=Second Test Site',
++          'primary=us-test2-netsrv-01',
++          'primaryip=10.2.3.4',
++          'secondary=us-test2-netsrv-02',
++          'secondaryip=10.2.3.5',
++          'priv=GROUPER:corpsre-team');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /INFO:\s+ isc-dhcp-server\s+ restart\s+ required/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site validating search us_test2';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++$t_out = run_cmd(@cmd_search);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my $site_dn = 'cn=us_test2,cn=net,dc=test,dc=com';
++    my @vals = (
++        "dn: cn=config,$site_dn",
++        "dn: cn=us-test2-netsrv-01,$site_dn",
++        "dn: cn=us-test2-netsrv-02,$site_dn");
++    for my $v (@vals) {
++        if ($t_out !~ /$v/ms) {
++            $err .= "ERROR: Missing $v\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Site search';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'find', 'us');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /us_test\s+ 2a01:5a20:1\s+ Test\s+ Site/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Site dump';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'detail', 'us');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @dns = (
++        'cn=config,cn=us_test,cn=net,dc=test,dc=com',
++        'cn=us-test-netsrv-01,cn=us_test,cn=net,dc=test,dc=com',
++        'cn=us-test-netsrv-02,cn=us_test,cn=net,dc=test,dc=com');
++    for my $dn (@dns) {
++        my $rex = $dn;
++        $rex =~ s{([()*&-])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $dn\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Site dump';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'detail', 'us');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @dns = (
++        'cn=config,cn=us_test,cn=net,dc=test,dc=com',
++        'cn=us-test-netsrv-01,cn=us_test,cn=net,dc=test,dc=com',
++        'cn=us-test-netsrv-02,cn=us_test,cn=net,dc=test,dc=com');
++    for my $dn (@dns) {
++        my $rex = $dn;
++        $rex =~ s{([()*&-])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $dn\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Site update domain-search';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'us_test', 'domain-search=some.domain.com');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @msgs = (
++        'Adding\s+ dhcpOption=domain\-search',
++        'INFO:\s+ isc-dhcp-server\s+ restart\s+ required');
++    for my $rex (@msgs) {
++        if ($t_out !~ /$rex/xms) {
++            $err .= "ERROR: Missing message $rex\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Site delete dns-search';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'us_test', 'dns-search/');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @msgs = (
++        'Deleting\s+ dhcpOption=domain\-search',
++        'INFO:\s+ isc-dhcp-server\s+ restart\s+ required');
++    for my $rex (@msgs) {
++        if ($t_out !~ /$rex/xms) {
++            $err .= "ERROR: Missing message $rex\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Site delete fqdn.no-client-update';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_site_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'us_test', 'fqdn.no-client-update/');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @msgs = (
++        'Deleting\s+ dhcpOption=fqdn\.no-client-update',
++        'INFO:\s+ isc-dhcp-server\s+ restart\s+ required');
++    for my $rex (@msgs) {
++        if ($t_out !~ /$rex/xms) {
++            $err .= "ERROR: Missing message $rex\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++##############################################################################
++# subnet tests
++##############################################################################
++
++$t_name = 'Subnet creation without comment';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', '1.2.3.0/24');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ a\s+ comment\s+ is\s+ required/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Subnet creation 1.2.3.0/24';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', '1.2.3.0/24',
++          'comment=VLAN1-wired',
++          'v6prefix=2a01:5a20:1:80',
++          'vlan=180');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @strs = (
++        'Add of subnet 1.2.3.0 complete',
++        'INFO: isc-dhcp-server restart required'
++    );
++    for my $s (@strs) {
++        if ($t_out !~ /$s/ms) {
++            $err .= "ERROR: Missing $s\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Subnet creation 1.2.4.0/24';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', '1.2.4.0/24',
++          'comment=VLAN180-wired',
++          'v6prefix=2a01:5a20:1:180',
++          'vlan=180',
++          'priv=GROUPER:corp-seceng');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @strs = (
++        'Add of subnet 1.2.4.0 complete',
++        'INFO: isc-dhcp-server restart required'
++    );
++    for my $s (@strs) {
++        if ($t_out !~ /$s/ms) {
++            $err .= "ERROR: Missing $s\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Subnet creation 4.3.2.0/24 with non-priv user';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', '4.3.2.0/24',
++          'comment=VLAN1-wired');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ access\s+ denied\s+ to\s+/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Subnet creation 4.3.2.0/24 with priv user';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', '4.3.2.0/24',
++          'comment=VLAN1-wired');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @strs = (
++        'Add of subnet 4.3.2.0 complete',
++        'INFO: isc-dhcp-server restart required'
++    );
++    for my $s (@strs) {
++        if ($t_out !~ /$s/ms) {
++            $err .= "ERROR: Missing $s\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Update lock status of subnet 4.3.2.0/24';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', '4.3.2.0',
++          'dbxnetstatus=locked');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    if ($t_out =~ /ERROR:/ms) {
++        $err .= $t_out;
++    }
++    my @strs = (
++        'Updating 4.3.2.0',
++        'Setting dbxNetStatus=locked'
++    );
++    for my $s (@strs) {
++        if ($t_out !~ /$s/ms) {
++            $err .= "ERROR: Missing $s\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Subnet update of dbxPrivilegeGroup with Grouper group';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', '1.2.3.0',
++          'priv=GROUPER:corp-seceng');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @strs = (
++        'Setting dbxPrivilegeGroup=(&'
++            . '(dbxStatus=active)'
++            . '(sshPublicKey=*)'
++            . '(dbxPrivilegeGroup=GROUPER:corp-seceng)'
++            . ')',
++        'Updating 1.2.3.0'
++    );
++    for my $s (@strs) {
++        my $rex = $s;
++        $rex =~ s{([()*&-.])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $s\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("OUTPUT: $t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Subnet update of dbxPrivilegeGroup with Permission';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', '1.2.3.0',
++          'priv=PERM:secretgroup=yes',
++          'vlan=180');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @strs = (
++        'Updating 1.2.3.0',
++        'Setting dbxVLAN=180'
++    );
++    for my $s (@strs) {
++        my $rex = $s;
++        $rex =~ s{([()*&-.])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $s\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("OUTPUT: $t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Subnet update setting the status to locked';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', '1.2.3.0',
++          'dbxnetstatus=locked');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @strs = (
++        'Updating 1.2.3.0',
++        'Setting dbxNetStatus=locked'
++    );
++    for my $s (@strs) {
++        my $rex = $s;
++        $rex =~ s{([()*&-.])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $s\n";
++            $err .= "INFO: regex = $rex\n";
++            $err .= "OUTPUT: $t_out\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("OUTPUT: $t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Subnet update attempt with bad attribute list';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', '1.2.3.0',
++          'foobar=bazfaz');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ invalid\s+ attribute/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Subnet search';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'find', '1.2.3');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /1.2.3.0\s+ 24\s+ 180\s+ VLAN1-wired/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Subnet dump';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subnet_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'detail', '1.2.3');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /dn:\s+ cn=1.2.3.0,cn=config,cn=us_test,
++         cn=net,dc=test,dc=com/xms)
++{
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++##############################################################################
++# pool tests
++##############################################################################
++
++$t_name = 'Pool creation';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_pool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', '1.2.3.0', 'VLAN1-wired',
++          'range=1.2.3.64,1.2.3.128');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /INFO:\s+ isc-dhcp-server\s+ restart\s+ required/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Pool search';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_pool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'find', '1.2.3.0', 'wired');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /1.2.3.0\s+ 1.2.3.64\s+ 1.2.3.128\s+ VLAN1-wired/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Pool dump';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_pool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'detail', '1.2.3.0', 'wired');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /dn:\s+ cn=VLAN1-wired,cn=1.2.3.0,cn=config,cn=us_test,
++         cn=net,dc=test,dc=com/xms)
++{
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Pool update dns-servers';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_pool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', '1.2.3.0', 'wired', 'dns-servers=8.8.8.8,8.8.4.4');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR/xms)
++{
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Pool update with invalid attribute';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_pool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', '1.2.3.0', 'wired', 'dirtypool=drypool');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ invalid\s+ attribute\s+ in/xms)
++{
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++##############################################################################
++# Host tests
++##############################################################################
++
++$t_name = 'Host creation (wobbly)';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'wobbly',
++          'mac=1234.5678.9101',
++          'ip=1.2.3.11',
++          'filename=pxelinux.0',
++          'next-server=fai.corp.dropbox.com',
++          'clientid=xx.xx.xx.xx.xx.xx.xx',
++          'port=sw13-21',
++          'cname=wprr',
++          'cname=uprr');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Adding\s+ cn:\s+ wobbly/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host creation (doyle)';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'doyle');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Adding\s+ cn:\s+ doyle/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host creation (deeth.corp.dropbox.com)';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'deeth.corp.dropbox.com');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Adding\s+ cn:\s+ deeth/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host creation (keddie)';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'keddie', 'priv=mycroft');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Adding\s+ cn:\s+ keddie/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host creation with invalid hostname';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'whm@wobbly');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ invalid\s+ hostname/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host Update admin access to host for Grouper group';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'wobbly',
++          'admin=GROUPER:corpsre-team');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @filters = (
++        '(dbxPrivilegeGroup=GROUPER:corpsre-team)');
++    for my $f (@filters) {
++        my $rex = $f;
++        $rex =~ s{([()*&-])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $f\n";
++            $err .= "INFO: regex = $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Host rename';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'rename', 'doyle', 'flanagan');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @filters = (
++        'Renaming\s+ doyle\s+ to\s+ flanagan',
++        'Updating\s+ flanagan',
++        'Deleting\s+ dhcpStatements',
++        'Deleting\s+ dhcpOption',
++        'Deleting\s+ krb5principalname',
++        'Adding\s+ dhcpStatements=ddns\-hostname',
++        'Adding\s+ dhcpOption=host\-name',
++        'Setting\s+ krb5principalname'
++    );
++    for my $rex (@filters) {
++        if ($t_out !~ /$rex/xms) {
++            $err .= "ERROR: Missing regex: $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        my $t_str = join(' ', @t_cmd);
++        print("Output from $t_str\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Host rename by nouser';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'nouser@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'rename', 'flanagan', 'doyle');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ user\s+ \S+\s+ has\s+ no\s+dbxPrivilege/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host rename by unauthorized user';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'rename', 'somehost', 'otherhost');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ access\s+ denied\s+ to\s+/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++
++$t_name = 'Host rename by authorized user';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'rename', 'keddie', 'oroville');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @filters = (
++        'Renaming\s+ keddie\s+ to\s+ oroville',
++        'Updating\s+ oroville',
++        'Deleting\s+ dhcpStatements',
++        'Deleting\s+ dhcpOption',
++        'Deleting\s+ krb5principalname',
++        'Adding\s+ dhcpStatements=ddns\-hostname',
++        'Adding\s+ dhcpOption=host\-name',
++        'Setting\s+ krb5principalname'
++    );
++    for my $rex (@filters) {
++        if ($t_out !~ /$rex/xms) {
++            $err .= "ERROR: Missing regex: $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        my $t_str = join(' ', @t_cmd);
++        print("Output from $t_str\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Host move and rename';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'move', 'flanagan', 'us_test2', 'doyle');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @filters = (
++        'Renaming\s+ flanagan\s+ to\s+ doyle',
++        'Updating\s+ doyle',
++        'Deleting\s+ dhcpStatements',
++        'Deleting\s+ dhcpOption',
++        'Deleting\s+ krb5principalname',
++        'Adding\s+ dhcpStatements=ddns\-hostname',
++        'Adding\s+ dhcpOption=host\-name',
++        'Setting\s+ krb5principalname'
++    );
++    for my $rex (@filters) {
++        if ($t_out !~ /$rex/xms) {
++            $err .= "ERROR: Missing regex: $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        my $t_str = join(' ', @t_cmd);
++        print("Output from $t_str\n");
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Host move';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'move', 'doyle', 'us_test');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @filters = (
++        'Moving\s+ doyle\s+ to\s+ us_test'
++    );
++    for my $rex (@filters) {
++        if ($t_out !~ /$rex/xms) {
++            $err .= "ERROR: Missing regex: $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        my $t_str = join(' ', @t_cmd);
++        print("Output from $t_str\n");
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Host acc-show';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'acc-show', 'wobbly');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @filters = (
++        'cn: wobbly',
++        'dbxHostAdmin: dbxPrivilegeGroup=GROUPER:corpsre-team');
++    for my $f (@filters) {
++        my $rex = $f;
++        $rex =~ s{([()*&-])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $f\n";
++            $err .= "INFO: regex = $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Host find';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'find');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /1.2.3.11\s+ 12:34:56:78:91:01\s+ us_test\s+ wobbly/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host show';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'show',
++          'wobbly');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /cn:\s+ wobbly/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host show failure';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'show',
++          'wob');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host show deeth';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'show',
++          'deeth');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /dhcpOption:\s+ domain-name\s+ "corp.dropbox.com"/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host update domain';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'wobbly', 'domain=net.corp.dropbox.com');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @rexes = (
++        'Deleting krb5principalname',
++        'Deleting objectclass',
++        'Adding dhcpStatements=ddns-domainname',
++        'Adding dhcpOption=domain-name',
++        'Setting krb5principalname',
++        'Setting objectclass=krb5principal'
++        );
++    for my $r (@rexes) {
++        my $rex = $r;
++        $rex =~ s{([()*&-])}{\\$1}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $r\n";
++            $err .= "INFO: regex = $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++$t_name = 'Host update with invalid attribute';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'wobbly', 'wobbly=railroad');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ invalid\s+ attribute\s+ in/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host update of comment';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'wobbly', 'comment=wobbly-railroad');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Setting\s+ dhcpComments=wobbly/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host add without ip';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'surf', 'mac=1234.5678.1234');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Adding\s+ cn:\s+ surf/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host add for non-site admin, invalid subnet';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'host-fail', 'ip=4.3.2.64');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ access\s+ denied\s+ to\s+ mycroft/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host add for non-site admin, valid subnet, locked subnet';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'host-okay', 'ip=1.2.3.64');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /ERROR:\s+ access\s+ denied\s+/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host add for non-site admin, valid subnet, unlocked subnet';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'host-okay', 'ip=1.2.4.64');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Adding\s+ cn:\s+ host\-okay/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host add to 4.3.2.0/24 with GROUPER:corp-seceng';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'add', 'host-other', 'ip=4.3.2.66', 'priv=GROUPER:corp-seceng');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Adding\s+ cn:\s+ host\-other/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host update comment by non-priv user';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'mycroft@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'update', 'host-other', 'comment=other-railroad');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /Setting\s+ dhcpComments=other/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'Host dump';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_host_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'detail', 'wobbly');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /dn:\s+ cn=wobbly,cn=config,cn=us_test,
++         cn=net,dc=test,dc=com/xms)
++{
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++##############################################################################
++# Subpool tests
++##############################################################################
++
++$t_name = 'SubPool creation';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subpool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'create', '10.10.10.0/24', 'VLAN10-linux-subnet',
++          '10.10.10.32', '10.10.10.128');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /INFO:\s+ isc-dhcp-server\s+ restart\s+ required/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'SubPool search';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subpool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'find', '10.10.10');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} elsif ($t_out =~ /\s+ Range:\s+ 10.10.10.32\s+ 10.10.10.128/xms) {
++    pass($t_name);
++} else {
++    print_err($t_name, $t_out);
++    fail($t_name);
++}
++
++$t_name = 'SubnetPool delete';
++$t_err  = 0;
++$ENV{'REMOTE_USER'} = 'whm@DROPBOX.INTERNAL';
++@t_cmd = ('../usr/share/ldap_net/ldap_subpool_maint.py',
++          '--conf=data/ldap-net-maint.conf',
++          'purge', '10.10.10.0');
++$t_out = run_cmd(@t_cmd);
++if (!$t_out) {
++    print_err($t_name, 'No output from command');
++    fail($t_name);
++} else {
++    my $err;
++    my @messages = (
++        'Deleting cn=VLAN10-linux-subnet',
++        'Deleting cn=10.10.10.0');
++    for my $m (@messages) {
++        my $rex = $m;
++        $rex =~ s{([()*&-])}{\\$1}xmsg;
++        $rex =~ s{\s+}{\\s+}xmsg;
++        if ($t_out !~ /$rex/ms) {
++            $err .= "ERROR: Missing $m\n";
++            $err .= "INFO: regex = $rex\n";
++        }
++    }
++    if ($err) {
++        print($err);
++        print("$t_out\n");
++        fail($t_name);
++    } else {
++        pass($t_name);
++    }
++}
++
++# ----------------------------------------------------------------------
++# Debugging display of ldap directory contents
++if ($opt_debug) {
++    $t_name = 'Debugging display of directory entries';
++    $t_err  = 0;
++    @cmd_search = ('/usr/bin/ldapsearch',
++                   '-x', '-LLL',
++                   '-H', $URI,
++                   '-b', 'dc=test,dc=com');
++    $t_out = run_cmd(@cmd_search);
++    if (!$t_out) {
++        print_err($t_name, 'No output from command');
++        fail($t_name);
++    } else {
++        print($t_out);
++        pass($t_name);
++    }
++}
++
++# ----------------------------------------------------------------------
++# Kill off the background slapd process.
++if (!-e $FILE_PID) {
++    print("ERROR: file not found $FILE_PID\n");
++} else {
++    system("kill -9 `cat $FILE_PID`");
++}
++
++exit 0;
