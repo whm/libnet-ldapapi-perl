@@ -1,3 +1,10 @@
+libnet-ldapapi-perl (3.0.7-2) UNRELEASED; urgency=medium
+
+  * Update to debhelper compatibility level v13.
+    - Depend on debhelper-compat instead of using debian/compat.
+
+ -- Russ Allbery <rra@debian.org>  Thu, 24 Dec 2020 16:35:17 -0800
+
 libnet-ldapapi-perl (3.0.7-1) unstable; urgency=medium
 
   * Import new upstream release.
