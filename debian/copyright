@@ -1,10 +1,10 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Source: http://sf.net/projects/net-ldapapi/
+Source: https://github.com/quanah/net-ldapapi
 Upstream-Contact: Quanah Gibson-Mount <mishikal@yahoo.com>
 Upstream-Name: Net-LDAPapi
 
 Files: *
-Copyright: 2007, 2017 Quanah Gibson-Mount. All rights reserved
+Copyright: 2007, 2017-2019 Quanah Gibson-Mount. All rights reserved
  2007, 2008, 2009 Board of Trustees, Leland Stanford Jr. University
  2003 Howard Chu. All rights reserved.
  1998 Clayton Donley. All rights reserved.
