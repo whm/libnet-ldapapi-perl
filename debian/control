@@ -12,6 +12,8 @@ Uploaders:
  Russ Allbery <rra@debian.org>,
 Standards-Version: 4.1.2
 Homepage: https://github.com/quanah/net-ldapapi
+Vcs-Browser: https://github.com/whm/libnet-ldapapi-perl
+Vcs-Git: https://github.com/whm/libnet-ldapapi-perl
 
 Package: libnet-ldapapi-perl
 Architecture: any
