@@ -13,7 +13,7 @@ Uploaders:
 Standards-Version: 4.5.1
 Homepage: https://github.com/quanah/net-ldapapi
 Vcs-Browser: https://github.com/whm/libnet-ldapapi-perl
-Vcs-Git: https://github.com/whm/libnet-ldapapi-perl
+Vcs-Git: https://github.com/whm/libnet-ldapapi-perl.git
 
 Package: libnet-ldapapi-perl
 Architecture: any
