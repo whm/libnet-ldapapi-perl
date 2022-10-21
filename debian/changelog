@@ -1,3 +1,9 @@
+libnet-ldapapi-perl (3.0.7-3) UNRELEASED; urgency=medium
+
+  * Set upstream metadata fields: Repository-Browse.
+
+ -- Debian Janitor <janitor@jelmer.uk>  Fri, 21 Oct 2022 08:01:29 -0000
+
 libnet-ldapapi-perl (3.0.7-2) unstable; urgency=medium
 
   * Update to debhelper compatibility level v13.
