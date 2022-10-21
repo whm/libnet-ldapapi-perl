@@ -2,6 +2,7 @@ libnet-ldapapi-perl (3.0.7-3) UNRELEASED; urgency=medium
 
   * Set upstream metadata fields: Repository-Browse.
   * Use canonical URL in Vcs-Git.
+  * Update standards version to 4.6.1, no changes needed.
 
  -- Debian Janitor <janitor@jelmer.uk>  Fri, 21 Oct 2022 08:01:29 -0000
 
