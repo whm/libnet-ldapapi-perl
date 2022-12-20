@@ -6,6 +6,7 @@ libnet-ldapapi-perl (3.0.7-3) UNRELEASED; urgency=medium
 
   [ Russ Allbery ]
   * Update standards version to 4.6.2 (no changes required).
+  * Add Bug-Database field to upstream metadata.
 
  -- Debian Janitor <janitor@jelmer.uk>  Fri, 21 Oct 2022 08:01:29 -0000
 
