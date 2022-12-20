@@ -1,4 +1,4 @@
-libnet-ldapapi-perl (3.0.7-3) UNRELEASED; urgency=medium
+libnet-ldapapi-perl (3.0.7-3) unstable; urgency=medium
 
   [ Debian Janitor ]
   * Set upstream metadata fields: Repository-Browse.
@@ -8,7 +8,7 @@ libnet-ldapapi-perl (3.0.7-3) UNRELEASED; urgency=medium
   * Update standards version to 4.6.2 (no changes required).
   * Add Bug-Database field to upstream metadata.
 
- -- Debian Janitor <janitor@jelmer.uk>  Fri, 21 Oct 2022 08:01:29 -0000
+ -- Russ Allbery <rra@debian.org>  Tue, 20 Dec 2022 08:52:56 -0800
 
 libnet-ldapapi-perl (3.0.7-2) unstable; urgency=medium
 
