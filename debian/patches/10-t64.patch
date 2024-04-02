@@ -1,0 +1,31 @@
+Description: Bug#1066630: libnet-ldapapi-perl: FTBFS: LDAPapi.c
+ This bug was caused by a change in dpkg 1.22.6, that enabled
+ -Werror=implicit-function-declaration.  In dpkg version 1.22.6, the
+ compiler flag -Werror=implicit-function-declaration was enabled by
+ default for all architectures in build flags (in dpkg 1.22.5 it had
+ been enabled conditionally on the abi time64 feature, so only on most
+ 32-bit architectures). The reason for doing this is avoiding
+ misbehavior of software affected by the ReleaseGoals/64bit-time
+ transition. When using a function with a time_t argument with an
+ implicit declaration, its type would be assumed to be int causing
+ silent truncation, or no symbol redirection (to their _time64
+ counterparts) would take effect.
+Author: Quanah Gibson-Mount <quanah@fast-mail.org>
+Origin: upstream, https://github.com/quanah/net-ldapapi
+Applied-Upstream: https://github.com/quanah/net-ldapapi/commit/0b7b45808bb644acfef4cd703d8d167e3a09007f
+Reviewed-by: Bill MacAllister <bill@ca-zephyr.org>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+Index: libnet-ldapapi-perl/Makefile.PL
+===================================================================
+--- libnet-ldapapi-perl.orig/Makefile.PL	2024-03-29 07:00:25.037139644 +0000
++++ libnet-ldapapi-perl/Makefile.PL	2024-04-02 07:07:21.401195313 +0000
+@@ -124,7 +124,7 @@
+ 	'DEFINE'        =>      '-DMOZILLA_LDAP',
+ 	) : (
+ 	'LIBS'          =>      ["-L$lib_ldap $ldap_lib"],
+-	'DEFINE'        =>      '-DOPENLDAP',
++	'DEFINE'        =>      '-DOPENLDAP -DLDAP_DEPRECATED=1',
+ 	)),
+ 	'depend'        =>      { 'LDAPapi.c' => 'constant.h' },
+ 	'clean'         =>      { 'FILES'     => 'constant.h' },
