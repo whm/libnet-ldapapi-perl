@@ -7,7 +7,6 @@ Build-Depends:
  libsasl2-dev,
  perl,
  perl-xs-dev,
-Rules-Requires-Root: no
 Maintainer: Bill MacAllister <bill@ca-zephyr.org>
 Uploaders:
  Russ Allbery <rra@debian.org>,
