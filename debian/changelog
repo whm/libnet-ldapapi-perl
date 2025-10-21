@@ -2,6 +2,7 @@ libnet-ldapapi-perl (3.0.7-5) UNRELEASED; urgency=medium
 
   * Add perl-xs-dev to the build dependencies. Thanks, Helmut.
     (Closes: #1102826)
+  * Update standards version to 4.7.2 (no changes required).
 
  -- Russ Allbery <rra@debian.org>  Tue, 21 Oct 2025 15:43:20 -0700
 
