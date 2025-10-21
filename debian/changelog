@@ -2,6 +2,7 @@ libnet-ldapapi-perl (3.0.7-5) UNRELEASED; urgency=medium
 
   * Add perl-xs-dev to the build dependencies. Thanks, Helmut.
     (Closes: #1102826)
+  * Fix various spelling errors in the documentation caught by Lintian.
   * Update debian/watch to version 5 and use the GitHub template.
   * Remove now-redundant Rules-Requires-Root field.
   * Update standards version to 4.7.2 (no changes required).
